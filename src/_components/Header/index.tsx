@@ -16,7 +16,7 @@ import { Divider } from "@nextui-org/react";
 export default function Header() {
   const [isLogin, setIsLogin] = useState(false);
   return (
-    <div className="w-full border-b-2 border-gray-500">
+    <div className="w-full ">
       <Navbar position="static" className="w-full border-b-1">
         <NavbarBrand>
           <Logo />
@@ -44,9 +44,6 @@ export default function Header() {
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify="end">
-          <NavbarItem className="hidden lg:flex">
-            <Link href="#">Login</Link>
-          </NavbarItem>
           <NavbarItem>
             {isLogin ? (
               <Button
