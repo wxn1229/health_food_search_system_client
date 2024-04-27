@@ -12,21 +12,37 @@ import {
 import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { default as axios } from "../../utils/axios";
+import {
+  InitSelecOptions,
+  selecOptionsType,
+} from "../../types/SearchSettingType";
 
-export default function Search() {
+interface SearchPropsType {
+  sendSearchSetting: (searchSetting: SearchSettingType) => void;
+}
+
+export default function Search({ sendSearchSetting }: SearchPropsType) {
   const [searchSetting, setSearchSetting] =
     useState<SearchSettingType>(InitSearchSetting);
 
-  const [selectOptions, setSelectOptions] = useState({});
+  const [selectOptions, setSelectOptions] =
+    useState<selecOptionsType>(InitSelecOptions);
 
   useEffect(() => {
     async function getData() {
       try {
         const applicants = await axios.get("/api/searchsetting/applicant");
+        const certifications = await axios.get(
+          "/api/searchsetting/certification"
+        );
+        const ingredients = await axios.get("/api/searchsetting/ingredient");
+        const benefits = await axios.get("/api/searchsetting/benefit");
 
-        console.log("🚀 ~ getData ~ applicants:", applicants.data.data);
         setSelectOptions({
           applicants: applicants.data.data,
+          certifications: certifications.data.data,
+          ingredients: ingredients.data.data,
+          benefits: benefits.data.data,
         });
       } catch (error) {
         console.log("🚀 ~ getData ~ error:", error);
@@ -34,51 +50,17 @@ export default function Search() {
     }
     getData();
   }, []);
-  useEffect(() => {
-    console.log("🚀 ~ selectOptions updated:", selectOptions);
-  }, [selectOptions]);
-  useEffect(() => {
-    console.log("🚀 ~ useEffect ~ searchSetting:", searchSetting);
-  }, [searchSetting]);
+
+  // onlistening selectOptions
+  // useEffect(() => {
+  //   console.log("🚀 ~ selectOptions updated:", selectOptions);
+  // }, [selectOptions]);
+
+  // onlistening searchSetting
+  // useEffect(() => {
+  //   console.log("🚀 ~ useEffect ~ searchSetting:", searchSetting);
+  // }, [searchSetting]);
   const mainvariant = "faded";
-  const applicants = [
-    {
-      id: "P1",
-      name: "統一",
-    },
-    {
-      id: "P2",
-      name: "花一",
-    },
-    {
-      id: "P3",
-      name: "條一",
-    },
-  ];
-  const animal = [
-    {
-      label: "Cat",
-      value: "cat",
-      description: "The second most popular pet in the world",
-    },
-    {
-      label: "Dog",
-      value: "dog",
-      description: "The most popular pet in the world",
-    },
-    {
-      label: "Elephant",
-      value: "elephant",
-      description: "The largest land animal",
-    },
-    { label: "Lion", value: "lion", description: "The king of the jungle" },
-    { label: "Tiger", value: "tiger", description: "The largest cat species" },
-    {
-      label: "Giraffe",
-      value: "giraffe",
-      description: "The tallest land animal",
-    },
-  ];
 
   return (
     <Accordion variant="shadow" className="w-8/12 overflow-hidden">
@@ -88,7 +70,10 @@ export default function Search() {
             type="text"
             value={searchSetting.keypoint}
             onChange={(e) => {
-              setSearchSetting({ ...searchSetting, keypoint: e.target.value });
+              setSearchSetting({
+                ...searchSetting,
+                keypoint: e.target.value.trim(),
+              });
             }}
             variant={mainvariant}
             label="keypoint"
@@ -98,7 +83,7 @@ export default function Search() {
             variant={mainvariant}
             value={searchSetting.id}
             onChange={(e) => {
-              setSearchSetting({ ...searchSetting, id: e.target.value });
+              setSearchSetting({ ...searchSetting, id: e.target.value.trim() });
             }}
             label="ID"
           ></Input>
@@ -123,7 +108,7 @@ export default function Search() {
           <div className="flex gap-4 overflow-hidden">
             <Autocomplete
               variant={mainvariant}
-              defaultItems={applicants}
+              defaultItems={selectOptions.applicants}
               label="Applicant"
               selectedKey={searchSetting.applicant}
               onSelectionChange={(e) => {
@@ -136,21 +121,32 @@ export default function Search() {
                 });
               }}
             >
-              {applicants.map((item) => {
+              {selectOptions.applicants.map((item) => {
                 return (
-                  <AutocompleteItem key={item.id}>{item.name}</AutocompleteItem>
+                  <AutocompleteItem key={item.Id} textValue={item.Name}>
+                    {item.Name}
+                  </AutocompleteItem>
                 );
               })}
             </Autocomplete>
             <Autocomplete
               variant={mainvariant}
-              defaultItems={animal}
+              defaultItems={selectOptions.certifications}
               label="certification"
+              onSelectionChange={(e) => {
+                setSearchSetting(() => {
+                  if (e) {
+                    return { ...searchSetting, certification: e.toString() };
+                  } else {
+                    return { ...searchSetting, certification: "" };
+                  }
+                });
+              }}
             >
-              {animal.map((item) => {
+              {selectOptions.certifications.map((item) => {
                 return (
-                  <AutocompleteItem key={item.value}>
-                    {item.label}
+                  <AutocompleteItem key={item.Id} textValue={item.Name}>
+                    {item.Name}
                   </AutocompleteItem>
                 );
               })}
@@ -159,62 +155,64 @@ export default function Search() {
           <div className="flex gap-4 overflow-hidden">
             <Autocomplete
               variant={mainvariant}
-              defaultItems={animal}
+              defaultItems={selectOptions.ingredients}
               label="Ingredient"
+              onSelectionChange={(e) => {
+                setSearchSetting(() => {
+                  if (e) {
+                    return { ...searchSetting, ingredient: e.toString() };
+                  } else {
+                    return { ...searchSetting, ingredient: "" };
+                  }
+                });
+              }}
               className=""
             >
-              {animal.map((item) => {
+              {selectOptions.ingredients.map((item) => {
                 return (
-                  <AutocompleteItem key={item.value}>
-                    {item.label}
+                  <AutocompleteItem
+                    key={item.Id}
+                    textValue={item.Name + "(" + item.EnglishName + ")"}
+                  >
+                    {item.Name} {item.EnglishName ? "(" : ""}
+                    {item.EnglishName ? item.EnglishName : ""}
+                    {item.EnglishName ? ")" : ""}
                   </AutocompleteItem>
                 );
               })}
             </Autocomplete>
             <Autocomplete
               variant={mainvariant}
-              defaultItems={animal}
+              defaultItems={selectOptions.benefits}
               label="Benefit"
+              onSelectionChange={(e) => {
+                setSearchSetting(() => {
+                  if (e) {
+                    return { ...searchSetting, benefit: e.toString() };
+                  } else {
+                    return { ...searchSetting, benefit: "" };
+                  }
+                });
+              }}
             >
-              {animal.map((item) => {
+              {selectOptions.benefits.map((item) => {
                 return (
-                  <AutocompleteItem key={item.value}>
-                    {item.label}
+                  <AutocompleteItem key={item.Id} textValue={item.Name}>
+                    {item.Name}
                   </AutocompleteItem>
                 );
               })}
             </Autocomplete>
           </div>
-          <div className="flex gap-4 overflow-hidden">
-            <Autocomplete
-              variant={mainvariant}
-              defaultItems={animal}
-              label="start rate point"
-              className=""
-            >
-              {animal.map((item) => {
-                return (
-                  <AutocompleteItem key={item.value}>
-                    {item.label}
-                  </AutocompleteItem>
-                );
-              })}
-            </Autocomplete>
-            <Autocomplete
-              variant={mainvariant}
-              defaultItems={animal}
-              label="end rate point"
-            >
-              {animal.map((item) => {
-                return (
-                  <AutocompleteItem key={item.value}>
-                    {item.label}
-                  </AutocompleteItem>
-                );
-              })}
-            </Autocomplete>
-          </div>
-          <Button color="primary" variant="bordered" endContent={<Send />}>
+
+          <Button
+            onClick={() => {
+              sendSearchSetting(searchSetting);
+            }}
+            color="primary"
+            variant="bordered"
+            endContent={<Send />}
+          >
             Search !
           </Button>
         </div>
