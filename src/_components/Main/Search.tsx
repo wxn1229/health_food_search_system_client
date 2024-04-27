@@ -11,11 +11,32 @@ import {
 } from "@nextui-org/react";
 import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
+import { default as axios } from "../../utils/axios";
 
 export default function Search() {
   const [searchSetting, setSearchSetting] =
     useState<SearchSettingType>(InitSearchSetting);
 
+  const [selectOptions, setSelectOptions] = useState({});
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        const applicants = await axios.get("/api/searchsetting/applicant");
+
+        console.log("🚀 ~ getData ~ applicants:", applicants.data.data);
+        setSelectOptions({
+          applicants: applicants.data.data,
+        });
+      } catch (error) {
+        console.log("🚀 ~ getData ~ error:", error);
+      }
+    }
+    getData();
+  }, []);
+  useEffect(() => {
+    console.log("🚀 ~ selectOptions updated:", selectOptions);
+  }, [selectOptions]);
   useEffect(() => {
     console.log("🚀 ~ useEffect ~ searchSetting:", searchSetting);
   }, [searchSetting]);

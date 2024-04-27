@@ -17,7 +17,7 @@ export default function Header() {
   const [isLogin, setIsLogin] = useState(false);
   return (
     <div className="w-full ">
-      <Navbar position="static" className="w-full border-b-1">
+      <Navbar position="static" className="w-full ">
         <NavbarBrand>
           <Logo />
           <Spacer x={4} />
