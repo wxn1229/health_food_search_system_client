@@ -63,7 +63,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
   const mainvariant = "faded";
 
   return (
-    <Accordion variant="shadow" className="w-8/12 overflow-hidden">
+    <Accordion variant="shadow" className="w-[90%] overflow-hidden">
       <AccordionItem key="1" aria-label="Accordion 1" title="Search setting ">
         <div className="flex flex-col mt-2 gap-2">
           <Input
