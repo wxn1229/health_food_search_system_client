@@ -73,7 +73,7 @@ export default function Header() {
           </NavbarItem>
         </NavbarContent>
       </Navbar>
-      <Divider className="my-4"></Divider>
+      <Divider className=""></Divider>
     </div>
   );
 }

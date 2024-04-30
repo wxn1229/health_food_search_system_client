@@ -1,7 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { SearchSettingType } from "../../../types/SearchType";
-import { Button, Card, CardBody, CardFooter, Image } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Image,
+  Link,
+} from "@nextui-org/react";
 import { Heading1, Heart } from "lucide-react";
 import { default as axios } from "../../../utils/axios";
 import { SearchResultType } from "../../../types/SearchResultType";
@@ -37,15 +44,15 @@ export default function SearchResult({ doSearch }: SearchResultPropsType) {
   const [like, setLike] = useState(false);
 
   return (
-    <div className="w-[90%] mt-2 gap-2 flex justify-around   flex-wrap">
+    <div className="w-[90%] mt-4 gap-2 flex justify-around   flex-wrap">
       {searchResult.length === 0 && <div>Not Found Result</div>}
       {searchResult.map((item, index) => (
         <Card
-          shadow="md"
+          shadow="lg"
           key={item.Id}
           isHoverable
           onPress={() => console.log("item pressed")}
-          className="w-[400px]"
+          className="w-[400px] mt-4 "
         >
           <CardBody className="overflow-visible p-2">
             <Image
@@ -86,20 +93,38 @@ export default function SearchResult({ doSearch }: SearchResultPropsType) {
                 })}
               </div>
             </div>
+            <div className="flex justify-between mt-3 px-1 gap-2">
+              <div>Benefits : </div>
+              <div className="flex flex-col items-end">
+                {item.HF_and_BF.map((item, index) => {
+                  return <div key={item.BF.Id}>{item.BF.Name}</div>;
+                })}
+              </div>
+            </div>
           </CardBody>
           <CardFooter className="text-small justify-between">
             <div>{item.Name}</div>
             <p className="text-default-500">{item.CF.Name}</p>
-            <Button
-              onClick={() => {
-                setLike(!like);
-              }}
-              isIconOnly
-              variant="flat"
-              color="danger"
-            >
-              <Heart fill={`${like ? "#f31260" : "none"}`}></Heart>
-            </Button>
+            <div className="flex justify-between items-center gap-2">
+              <Button
+                onClick={() => {
+                  setLike(!like);
+                }}
+                isIconOnly
+                variant="flat"
+                color="danger"
+              >
+                <Heart fill={`${like ? "#f31260" : "none"}`}></Heart>
+              </Button>
+              <Button
+                variant="flat"
+                color="primary"
+                as={Link}
+                href={`healthfood/${item.Id}`}
+              >
+                more...
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       ))}

@@ -21,7 +21,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <NextUIProvider>
           <NextThemesProvider attribute="class" defaultTheme="dark">
-            {children}
+            <div className="w-full h-screen bg-green-100 dark:bg-zinc-800">
+              {children}
+            </div>
           </NextThemesProvider>
         </NextUIProvider>
       </body>
