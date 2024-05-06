@@ -25,18 +25,19 @@ export default function IdMain({ id }: IdMainProps) {
   }, []);
 
   return (
-    <div className="w-full h-full flex justify-center items-center">
+    <div className="w-full h-full min-h-screen flex justify-center items-center">
       <Card className="w-[70%]">
-        <CardBody>
-          <div className="flex">
+        <CardBody className="w-full">
+          <div className="flex w-full">
             <Image
               shadow="sm"
               radius="lg"
+              width={500}
               alt="title"
-              className="w-full h-full object-cover "
-              src={`https://picsum.photos/seed/${IdData?.Id}/500/500`}
+              className="h-full"
+              src={`/HF_img/${IdData?.Id}.jpg`}
             />
-            <div className="flex-1 px-4">
+            <div className="w-[50%] px-4">
               <h1>{IdData?.Name}</h1>
               <div className="flex flex-col justify-around">
                 <div className="flex justify-between">

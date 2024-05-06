@@ -60,8 +60,8 @@ export default function SearchResult({ doSearch }: SearchResultPropsType) {
               radius="lg"
               width="100"
               alt={item.Name}
-              className="w-full object-cover "
-              src={`https://picsum.photos/seed/${item.Id}/300/200`}
+              className="w-full h-[384px] object-cover "
+              src={`/HF_img/${item.Id}.jpg`}
             />
             <div className="flex justify-between mt-3 px-1 gap-2">
               <div>Health Food Id: </div>
