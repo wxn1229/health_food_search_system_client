@@ -1,9 +1,4 @@
-import { Inter } from "next/font/google";
 import "@/app/globals.css";
-import { NextUIProvider } from "@nextui-org/react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function HealthFoodIdLayout({
   children,
