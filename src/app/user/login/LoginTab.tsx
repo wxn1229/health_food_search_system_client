@@ -1,6 +1,11 @@
 "use client";
 
 import {
+  ForgetInputType,
+  LoginInputType,
+  SignupInputType,
+} from "@/types/LogintType";
+import {
   Tab,
   Tabs,
   Button,
@@ -10,13 +15,31 @@ import {
   Link,
   Image,
 } from "@nextui-org/react";
-import { Key, useState } from "react";
+import { Key, useEffect, useState } from "react";
 
 export default function LoginTab() {
   const [selected, setSelected] = useState<Key>("login");
+  const [loginInput, setLoginInput] = useState<LoginInputType>({
+    email: "",
+    password: "",
+  });
+  const [signupInput, setSignupInput] = useState<SignupInputType>({
+    name: "",
+    email: "",
+    password: "",
+    checkPassword: "",
+  });
+  const [forgetInput, setForgetInput] = useState<ForgetInputType>({
+    email: "",
+  });
+
+  // useEffect(() => {
+  //   console.log("🚀 ~ LoginTab ~ loginInput:", loginInput);
+  // }, [loginInput]);
+
   return (
     <div className="flex flex-col w-full h-full min-h-screen items-center justify-center">
-      <Card className="max-w-full w-[50%]  mb-20">
+      <Card className="max-w-full w-[50%] mb-20">
         <CardBody className="overflow-hidden">
           <div className="flex w-full">
             <div className="w-[50%]">
@@ -45,12 +68,26 @@ export default function LoginTab() {
                       label="Email"
                       placeholder="Enter your email"
                       type="email"
+                      value={loginInput.email}
+                      onChange={(e) => {
+                        setLoginInput({
+                          ...loginInput,
+                          email: e.target.value.trim(),
+                        });
+                      }}
                     />
                     <Input
                       isRequired
                       label="Password"
                       placeholder="Enter your password"
                       type="password"
+                      value={loginInput.password}
+                      onChange={(e) => {
+                        setLoginInput({
+                          ...loginInput,
+                          password: e.target.value.trim(),
+                        });
+                      }}
                     />
                     <p className="text-center text-small">
                       Need to create an account?{" "}
@@ -78,24 +115,52 @@ export default function LoginTab() {
                       label="Name"
                       placeholder="Enter your name"
                       type="name"
+                      value={signupInput.name}
+                      onChange={(e) => {
+                        setSignupInput({
+                          ...signupInput,
+                          name: e.target.value,
+                        });
+                      }}
                     />
                     <Input
                       isRequired
                       label="Email"
                       placeholder="Enter your email"
                       type="email"
+                      value={signupInput.email}
+                      onChange={(e) => {
+                        setSignupInput({
+                          ...signupInput,
+                          email: e.target.value,
+                        });
+                      }}
                     />
                     <Input
                       isRequired
                       label="Password"
                       placeholder="Enter your password"
                       type="password"
+                      value={signupInput.password}
+                      onChange={(e) => {
+                        setSignupInput({
+                          ...signupInput,
+                          password: e.target.value,
+                        });
+                      }}
                     />
                     <Input
                       isRequired
                       label="CheckPassword"
                       placeholder="Enter your password again"
                       type="password"
+                      value={signupInput.checkPassword}
+                      onChange={(e) => {
+                        setSignupInput({
+                          ...signupInput,
+                          checkPassword: e.target.value,
+                        });
+                      }}
                     />
                     <p className="text-center text-small">
                       Already have an account?{" "}
@@ -117,6 +182,13 @@ export default function LoginTab() {
                       label="Email"
                       placeholder="Enter your email"
                       type="email"
+                      value={forgetInput.email}
+                      onChange={(e) => {
+                        setForgetInput({
+                          ...forgetInput,
+                          email: e.target.value,
+                        });
+                      }}
                     />
 
                     <p className="text-center text-small">
