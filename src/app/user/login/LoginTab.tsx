@@ -5,6 +5,8 @@ import {
   LoginInputType,
   SignupInputType,
 } from "@/types/LogintType";
+import { useAuth } from "@/utils/AuthContext";
+import { default as axios } from "@/utils/axios";
 import {
   Tab,
   Tabs,
@@ -15,10 +17,14 @@ import {
   Link,
   Image,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { Key, useEffect, useState } from "react";
 
 export default function LoginTab() {
   const [selected, setSelected] = useState<Key>("login");
+
+  const [passwordValid, setPasswordValid] = useState(true);
+  const [checkPasswordCorrect, setCheckPasswordCorrect] = useState(false);
   const [loginInput, setLoginInput] = useState<LoginInputType>({
     email: "",
     password: "",
@@ -33,9 +39,61 @@ export default function LoginTab() {
     email: "",
   });
 
-  // useEffect(() => {
-  //   console.log("🚀 ~ LoginTab ~ loginInput:", loginInput);
-  // }, [loginInput]);
+  const { login } = useAuth();
+  const router = useRouter();
+
+  async function loginHandler() {
+    try {
+      const loginResult = await axios.post("/api/user/login", {
+        email: loginInput.email,
+        password: loginInput.password,
+      });
+
+      if (loginResult.status === 200) {
+        localStorage.setItem("user_token", loginResult.data.token);
+        console.log("success get user_token");
+        login(loginResult.data.user_name);
+        alert(`success login ${loginResult.data.user_name}`);
+        router.push("/");
+      }
+      console.log("🚀 ~ loginHandler ~ loginInput:", loginInput);
+
+      console.log("🚀 ~ loginHandler ~ loginResult:", loginResult);
+    } catch (error) {
+      console.log("🚀 ~ loginHandler ~ error:", error);
+    }
+  }
+
+  async function signupHandler() {
+    try {
+      const signupResult = await axios.post("/api/user/signup", {
+        email: signupInput.email,
+        name: signupInput.name,
+        password: signupInput.password,
+      });
+    } catch (error) {
+      console.log("🚀 ~ signupHandler ~ error:", error);
+    }
+  }
+
+  useEffect(() => {
+    console.log("🚀 ~ LoginTab ~ signupInput:", signupInput);
+  }, [signupInput]);
+
+  useEffect(() => {
+    if (signupInput.password === signupInput.checkPassword) {
+      setCheckPasswordCorrect(true);
+    } else {
+      setCheckPasswordCorrect(false);
+    }
+  }, [signupInput]);
+  useEffect(() => {
+    if (signupInput.password.length >= 8) {
+      setPasswordValid(true);
+    } else {
+      setPasswordValid(false);
+    }
+  }, [signupInput]);
 
   return (
     <div className="flex flex-col w-full h-full min-h-screen items-center justify-center">
@@ -102,7 +160,7 @@ export default function LoginTab() {
                       </Link>
                     </p>
                     <div className="flex gap-2 justify-end">
-                      <Button fullWidth color="primary">
+                      <Button fullWidth color="primary" onClick={loginHandler}>
                         Login
                       </Button>
                     </div>
@@ -141,6 +199,10 @@ export default function LoginTab() {
                       label="Password"
                       placeholder="Enter your password"
                       type="password"
+                      isInvalid={!passwordValid}
+                      errorMessage={
+                        "Password must be at least eight characters"
+                      }
                       value={signupInput.password}
                       onChange={(e) => {
                         setSignupInput({
@@ -155,6 +217,8 @@ export default function LoginTab() {
                       placeholder="Enter your password again"
                       type="password"
                       value={signupInput.checkPassword}
+                      errorMessage={"Not the same as password"}
+                      isInvalid={!checkPasswordCorrect}
                       onChange={(e) => {
                         setSignupInput({
                           ...signupInput,

@@ -12,13 +12,21 @@ import {
 import Logo from "./Logo";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Divider } from "@nextui-org/react";
+import { useAuth } from "@/utils/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const [isLogin, setIsLogin] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
   return (
     <div className="w-full ">
       <Navbar position="static" className="w-full ">
-        <NavbarBrand>
+        <NavbarBrand
+          className="cursor-pointer"
+          onClick={() => {
+            router.push("/");
+          }}
+        >
           <Logo />
           <Spacer x={4} />
           <p className="font-bold text-inherit">HFS&CS</p>
@@ -45,10 +53,16 @@ export default function Header() {
         </NavbarContent>
         <NavbarContent justify="end">
           <NavbarItem>
-            {isLogin ? (
+            <p>
+              Hello, <span>{user.isAuth ? user.user_name : "guest"}</span>
+            </p>
+          </NavbarItem>
+          <NavbarItem>
+            {user.isAuth ? (
               <Button
                 onClick={() => {
-                  setIsLogin(false);
+                  localStorage.removeItem("user_token");
+                  logout();
                 }}
                 as={Link}
                 color="warning"
@@ -59,15 +73,12 @@ export default function Header() {
               </Button>
             ) : (
               <Button
-                onClick={() => {
-                  setIsLogin(true);
-                }}
                 as={Link}
                 color="primary"
-                href="#"
+                href="/user/login"
                 variant="ghost"
               >
-                Sign Up
+                Login
               </Button>
             )}
           </NavbarItem>

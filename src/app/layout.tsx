@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { AuthProvider } from "@/utils/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +22,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <NextUIProvider>
           <NextThemesProvider attribute="class" defaultTheme="dark">
-            <div className="w-full h-full min-h-screen bg-green-100 dark:bg-zinc-800">
-              {children}
-            </div>
+            <AuthProvider>
+              <div className="w-full h-full min-h-screen bg-green-100 dark:bg-zinc-800">
+                {children}
+              </div>
+            </AuthProvider>
           </NextThemesProvider>
         </NextUIProvider>
       </body>
