@@ -8,6 +8,8 @@ export type SignupInputType = {
   email: string;
   password: string;
   checkPassword: string;
+  gender: boolean;
+  age: number | number[];
 };
 
 export type ForgetInputType = {

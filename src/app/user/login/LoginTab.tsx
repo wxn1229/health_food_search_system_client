@@ -4,7 +4,7 @@ import {
   ForgetInputType,
   LoginInputType,
   SignupInputType,
-} from "@/types/LogintType";
+} from "@/types/LoginType";
 import { useAuth } from "@/utils/AuthContext";
 import { default as axios } from "@/utils/axios";
 import {
@@ -16,6 +16,9 @@ import {
   Input,
   Link,
   Image,
+  Slider,
+  Radio,
+  RadioGroup,
 } from "@nextui-org/react";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
@@ -27,6 +30,8 @@ export default function LoginTab() {
   const [passwordValid, setPasswordValid] = useState(true);
   const [checkPasswordCorrect, setCheckPasswordCorrect] = useState(false);
   const [checkName, setCheckName] = useState(true);
+  const [userGender, setUserGender] = useState("male");
+  const [userAge, setUserAge] = useState(18);
   const [loginInput, setLoginInput] = useState<LoginInputType>({
     email: "",
     password: "",
@@ -36,6 +41,8 @@ export default function LoginTab() {
     email: "",
     password: "",
     checkPassword: "",
+    gender: true,
+    age: 18,
   });
   const [forgetInput, setForgetInput] = useState<ForgetInputType>({
     email: "",
@@ -120,6 +127,20 @@ export default function LoginTab() {
     }
   }, [signupInput]);
 
+  // gender
+
+  useEffect(() => {
+    if (userGender === "male") {
+      setSignupInput((s) => {
+        return { ...s, gender: true };
+      });
+    } else {
+      setSignupInput((s) => {
+        return { ...s, gender: false };
+      });
+    }
+  }, [userGender]);
+
   useEffect(() => {
     if (signupInput.name.length >= 1) {
       setCheckName(true);
@@ -130,7 +151,7 @@ export default function LoginTab() {
 
   return (
     <div className="flex flex-col w-full h-full min-h-screen items-center justify-center">
-      <Card className="max-w-full min-w-[1000px] w-[60%] mb-20">
+      <Card className="max-w-full min-w-[1100px] w-[60%] mb-20">
         <CardBody className="overflow-hidden">
           <div className="flex w-full">
             <div className="w-[60%]">
@@ -226,6 +247,28 @@ export default function LoginTab() {
                         });
                       }}
                     />
+                    <Slider
+                      label="age"
+                      step={1}
+                      maxValue={150}
+                      minValue={1}
+                      defaultValue={18}
+                      className="max-w-md"
+                      value={signupInput.age}
+                      onChange={(e) => {
+                        setSignupInput({ ...signupInput, age: e });
+                      }}
+                    />
+                    <RadioGroup
+                      label="select your gender"
+                      orientation="horizontal"
+                      defaultValue="male"
+                      value={userGender}
+                      onValueChange={setUserGender}
+                    >
+                      <Radio value="male">male</Radio>
+                      <Radio value="female">female</Radio>
+                    </RadioGroup>
                     <Input
                       isRequired
                       label="Password"
