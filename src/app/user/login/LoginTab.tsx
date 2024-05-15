@@ -17,6 +17,7 @@ import {
   Link,
   Image,
 } from "@nextui-org/react";
+import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Key, useEffect, useState } from "react";
 
@@ -25,6 +26,7 @@ export default function LoginTab() {
 
   const [passwordValid, setPasswordValid] = useState(true);
   const [checkPasswordCorrect, setCheckPasswordCorrect] = useState(false);
+  const [checkName, setCheckName] = useState(true);
   const [loginInput, setLoginInput] = useState<LoginInputType>({
     email: "",
     password: "",
@@ -48,31 +50,51 @@ export default function LoginTab() {
         email: loginInput.email,
         password: loginInput.password,
       });
-
+      console.log("🚀 ~ loginHandler ~ loginResult:", loginResult);
       if (loginResult.status === 200) {
         localStorage.setItem("user_token", loginResult.data.token);
         console.log("success get user_token");
         login(loginResult.data.user_name);
         alert(`success login ${loginResult.data.user_name}`);
         router.push("/");
-      }
-      console.log("🚀 ~ loginHandler ~ loginInput:", loginInput);
+      } else console.log("🚀 ~ loginHandler ~ loginInput:", loginInput);
 
       console.log("🚀 ~ loginHandler ~ loginResult:", loginResult);
-    } catch (error) {
+    } catch (error: AxiosError | any) {
       console.log("🚀 ~ loginHandler ~ error:", error);
+      console.log("🚀 ~ loginHandler ~ error:", error.response);
+      if (error.response.status === 405) {
+        alert("Please sign up an account");
+        setSelected("sign-up");
+      } else if (error.response.status === 401) {
+        alert("your password or email is not correct");
+      } else {
+        alert("server error");
+      }
     }
   }
 
   async function signupHandler() {
     try {
-      const signupResult = await axios.post("/api/user/signup", {
-        email: signupInput.email,
-        name: signupInput.name,
-        password: signupInput.password,
-      });
-    } catch (error) {
+      if (checkPasswordCorrect && passwordValid && checkName) {
+        const signupResult = await axios.post("/api/user/signup", {
+          email: signupInput.email,
+          username: signupInput.name,
+          password: signupInput.password,
+        });
+        console.log("🚀 ~ signupHandler ~ signupResult:", signupResult);
+      } else {
+        alert(
+          "Please make your password conform to the format and confirm that the password is correct"
+        );
+      }
+    } catch (error: any) {
       console.log("🚀 ~ signupHandler ~ error:", error);
+      if (error.response.status === 406) {
+        alert("This email address has already been sign up");
+      } else {
+        alert("server error");
+      }
     }
   }
 
@@ -80,6 +102,7 @@ export default function LoginTab() {
     console.log("🚀 ~ LoginTab ~ signupInput:", signupInput);
   }, [signupInput]);
 
+  // checkpassword and password are same
   useEffect(() => {
     if (signupInput.password === signupInput.checkPassword) {
       setCheckPasswordCorrect(true);
@@ -87,6 +110,8 @@ export default function LoginTab() {
       setCheckPasswordCorrect(false);
     }
   }, [signupInput]);
+
+  // password.length >= 8
   useEffect(() => {
     if (signupInput.password.length >= 8) {
       setPasswordValid(true);
@@ -95,17 +120,24 @@ export default function LoginTab() {
     }
   }, [signupInput]);
 
+  useEffect(() => {
+    if (signupInput.name.length >= 1) {
+      setCheckName(true);
+    } else {
+      setPasswordValid(false);
+    }
+  }, [signupInput]);
+
   return (
     <div className="flex flex-col w-full h-full min-h-screen items-center justify-center">
-      <Card className="max-w-full w-[50%] mb-20">
+      <Card className="max-w-full min-w-[1000px] w-[60%] mb-20">
         <CardBody className="overflow-hidden">
           <div className="flex w-full">
-            <div className="w-[50%]">
+            <div className="w-[60%]">
               <Image
                 isZoomed
                 alt="Album cover"
                 className="object-cover"
-                height={512}
                 shadow="md"
                 src="/login_pic.webp"
                 width="100%"
@@ -233,7 +265,7 @@ export default function LoginTab() {
                       </Link>
                     </p>
                     <div className="flex gap-2 justify-end">
-                      <Button fullWidth color="primary">
+                      <Button fullWidth color="primary" onClick={signupHandler}>
                         Sign up
                       </Button>
                     </div>
