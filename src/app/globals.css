@@ -10,7 +10,18 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
+/* [data-overlay-container="true"] {
+  height: 100%;
+  width: 100%;
+} */
 
+/* html,
+body,
+body > div:first-child,
+div#__next,
+div#__next > div {
+  height: 100%;
+} */
 /* body > div:first-child {
   height: 100%;
   width: 100%;

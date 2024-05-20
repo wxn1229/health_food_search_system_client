@@ -31,7 +31,6 @@ export default function LoginTab() {
   const [checkPasswordCorrect, setCheckPasswordCorrect] = useState(false);
   const [checkName, setCheckName] = useState(true);
   const [userGender, setUserGender] = useState("male");
-  const [userAge, setUserAge] = useState(18);
   const [loginInput, setLoginInput] = useState<LoginInputType>({
     email: "",
     password: "",
@@ -88,8 +87,22 @@ export default function LoginTab() {
           email: signupInput.email,
           username: signupInput.name,
           password: signupInput.password,
+          age: signupInput.age,
+          gender: signupInput.gender,
         });
-        console.log("🚀 ~ signupHandler ~ signupResult:", signupResult);
+
+        if (signupResult) {
+          alert("sign up success");
+          setSelected("login");
+          setSignupInput({
+            name: "",
+            email: "",
+            password: "",
+            checkPassword: "",
+            gender: true,
+            age: 18,
+          });
+        }
       } else {
         alert(
           "Please make your password conform to the format and confirm that the password is correct"
@@ -99,6 +112,8 @@ export default function LoginTab() {
       console.log("🚀 ~ signupHandler ~ error:", error);
       if (error.response.status === 406) {
         alert("This email address has already been sign up");
+      } else if (error.response.status === 407) {
+        alert("This user name has already been sign up");
       } else {
         alert("server error");
       }

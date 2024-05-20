@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -14,8 +14,30 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Divider } from "@nextui-org/react";
 import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "next/navigation";
+import { default as axios } from "@/utils/axios";
 
 export default function Header() {
+  const { login } = useAuth();
+
+  useEffect(() => {
+    async function verifyToken() {
+      try {
+        const isVaild = await axios.get("/api/user/verifyToken", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+          },
+        });
+
+        if (isVaild) {
+          login(isVaild.data.user_name);
+          console.log("🚀 ~ verifyToken ~ isVaild:", isVaild);
+        }
+      } catch (error) {
+        console.log("🚀 ~ verifyToken ~ error:", error);
+      }
+    }
+    verifyToken();
+  }, [login]);
   const { user, logout } = useAuth();
   const router = useRouter();
   return (
@@ -54,7 +76,19 @@ export default function Header() {
         <NavbarContent justify="end">
           <NavbarItem>
             <p>
-              Hello, <span>{user.isAuth ? user.user_name : "guest"}</span>
+              Hello,{" "}
+              {user.isAuth ? (
+                <Link
+                  isBlock
+                  showAnchorIcon
+                  href={`/user/settings`}
+                  color="primary"
+                >
+                  {user.user_name}
+                </Link>
+              ) : (
+                <span>guest</span>
+              )}
             </p>
           </NavbarItem>
           <NavbarItem>

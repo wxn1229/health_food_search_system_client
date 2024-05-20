@@ -23,7 +23,7 @@ export default function RootLayout({
         <NextUIProvider>
           <NextThemesProvider attribute="class" defaultTheme="dark">
             <AuthProvider>
-              <div className="w-full h-full min-h-screen bg-green-100 dark:bg-zinc-800">
+              <div className="w-full h-full min-h-screen  bg-green-100 dark:bg-zinc-800">
                 {children}
               </div>
             </AuthProvider>
