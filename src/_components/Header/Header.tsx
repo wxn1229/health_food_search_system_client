@@ -40,6 +40,7 @@ export default function Header() {
       }
     }
     verifyToken();
+    console.log(process.env.SERVER_URL);
   }, [reload]);
   const { user, logout } = useAuth();
   const router = useRouter();
