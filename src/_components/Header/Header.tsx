@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { default as axios } from "@/utils/axios";
 
 export default function Header() {
-  const { login } = useAuth();
+  const { login, reload } = useAuth();
 
   useEffect(() => {
     async function verifyToken() {
@@ -29,7 +29,10 @@ export default function Header() {
         });
 
         if (isVaild) {
-          login(isVaild.data.user_name);
+          const user = await axios.post("/api/user/searchUserById", {
+            userId: isVaild.data.user_id,
+          });
+          login(user.data.user.Name);
           console.log("🚀 ~ verifyToken ~ isVaild:", isVaild);
         }
       } catch (error) {
@@ -37,7 +40,7 @@ export default function Header() {
       }
     }
     verifyToken();
-  }, [login]);
+  }, [reload]);
   const { user, logout } = useAuth();
   const router = useRouter();
   return (
@@ -95,7 +98,6 @@ export default function Header() {
             {user.isAuth ? (
               <Button
                 onClick={() => {
-                  localStorage.removeItem("user_token");
                   logout();
                 }}
                 as={Link}

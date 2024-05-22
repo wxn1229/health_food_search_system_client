@@ -105,7 +105,7 @@ export default function LoginTab() {
         }
       } else {
         alert(
-          "Please make your password conform to the format and confirm that the password is correct"
+          "Please make your password conform to the format and confirm that the check password is correct"
         );
       }
     } catch (error: any) {
@@ -160,7 +160,7 @@ export default function LoginTab() {
     if (signupInput.name.length >= 1) {
       setCheckName(true);
     } else {
-      setPasswordValid(false);
+      setCheckName(false);
     }
   }, [signupInput]);
 
@@ -237,10 +237,11 @@ export default function LoginTab() {
                 <Tab key="sign-up" title="Sign up">
                   <form className="flex flex-col gap-4 h-[300px]">
                     <Input
-                      isRequired
                       label="Name"
                       placeholder="Enter your name"
                       type="name"
+                      isInvalid={!checkName}
+                      errorMessage={"Name cannot be empty"}
                       value={signupInput.name}
                       onChange={(e) => {
                         setSignupInput({
