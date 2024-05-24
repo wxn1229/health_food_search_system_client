@@ -22,10 +22,10 @@ export default function IdMain({ id }: IdMainProps) {
       }
     }
     getIdData();
-  }, []);
+  }, [id]);
 
   return (
-    <div className="w-full h-full min-h-screen flex justify-center items-center">
+    <div className="w-full h-full flex justify-center items-center my-10">
       <Card className="w-[70%]">
         <CardBody className="w-full">
           <div className="flex w-full">
