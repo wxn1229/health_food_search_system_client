@@ -35,7 +35,7 @@ export default function IdMain({ id }: IdMainProps) {
               width={500}
               alt="title"
               className="h-full"
-              src={`/HF_img/${IdData?.Id}.jpg`}
+              src={`/HF_img/${id}.jpg`}
             />
             <div className="w-[50%] px-4">
               <h1>{IdData?.Name}</h1>

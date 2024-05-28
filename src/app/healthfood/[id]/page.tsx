@@ -14,8 +14,8 @@ export default function HealthFoodIdPage({ params }: HealthFoodIdPageProps) {
 
       <IdMain id={params.id}></IdMain>
       <Card className="w-[70%]">
-        <CardBody>
-          <Comment></Comment>
+        <CardBody className="flex justify-center items-center">
+          <Comment id={params.id}></Comment>
         </CardBody>
       </Card>
     </div>

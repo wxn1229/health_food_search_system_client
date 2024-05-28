@@ -12,12 +12,14 @@ import {
 import { Heading1, Heart } from "lucide-react";
 import { default as axios } from "../../../utils/axios";
 import { SearchResultType } from "../../../types/SearchResultType";
+import { useRouter } from "next/navigation";
 interface SearchResultPropsType {
   doSearch: SearchSettingType;
 }
 
 export default function SearchResult({ doSearch }: SearchResultPropsType) {
   const [searchResult, setSearchResult] = useState<SearchResultType[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function getSearchResult() {
@@ -119,8 +121,9 @@ export default function SearchResult({ doSearch }: SearchResultPropsType) {
               <Button
                 variant="flat"
                 color="primary"
-                as={Link}
-                href={`healthfood/${item.Id}`}
+                onClick={() => {
+                  router.push(`/healthfood/${item.Id}`);
+                }}
               >
                 more...
               </Button>

@@ -27,15 +27,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={lato.className}>
-        <NextUIProvider>
-          <NextThemesProvider attribute="class" defaultTheme="dark">
-            <AuthProvider>
+        <AuthProvider>
+          <NextUIProvider>
+            <NextThemesProvider attribute="class" defaultTheme="dark">
               <div className="w-full h-full min-h-screen  bg-green-200 dark:bg-zinc-800">
                 {children}
               </div>
-            </AuthProvider>
-          </NextThemesProvider>
-        </NextUIProvider>
+            </NextThemesProvider>
+          </NextUIProvider>
+        </AuthProvider>
       </body>
     </html>
   );

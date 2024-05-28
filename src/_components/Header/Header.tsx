@@ -40,7 +40,8 @@ export default function Header() {
       }
     }
     verifyToken();
-    console.log(process.env.SERVER_URL);
+    // console.log("🚀 ~ Header ~ user:", user);
+    // console.log(process.env.SERVER_URL);
   }, [reload]);
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -85,7 +86,9 @@ export default function Header() {
                 <Link
                   isBlock
                   showAnchorIcon
-                  href={`/user/settings`}
+                  onClick={() => {
+                    router.push("/user/settings");
+                  }}
                   color="primary"
                 >
                   {user.user_name}
