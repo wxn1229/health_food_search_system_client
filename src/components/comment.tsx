@@ -34,21 +34,14 @@ export function Comment({ id }: CommentProps) {
   const [content, setContent] = useState("");
   const [score, setScore] = useState<number | number[]>(0);
   const { user } = useAuth();
+  const [reload, setReload] = useState(true);
 
   useEffect(() => {
     async function getComments() {
       try {
-        const comments = await axios.post(
-          "/api/user/getComments",
-          {
-            hfId: id,
-          }
-          // {
-          //   headers: {
-          //     Authorization: `Bearer ${localStorage.getItem("user_token")}`,
-          //   },
-          // }
-        );
+        const comments = await axios.post("/api/user/getComments", {
+          hfId: id,
+        });
         console.log("🚀 ~ getComments ~ comments:", comments);
         setCommentData(comments.data.comments);
       } catch (error) {
@@ -57,10 +50,31 @@ export function Comment({ id }: CommentProps) {
     }
 
     getComments();
-  }, []);
+  }, [reload]);
+  function formatComment(content: string) {
+    return content.replace(/\n/g, "<br/>");
+  }
 
   async function submitHandler() {
     try {
+      const submit = await axios.post(
+        "api/user/submitComment",
+        {
+          content: content,
+          hfId: id,
+          modifyTime: new Date().toISOString(),
+          score: score,
+        },
+
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+          },
+        }
+      );
+
+      console.log("🚀 ~ submitHandler ~ submit:", submit);
+      setReload(!reload);
     } catch (error) {
       console.log("🚀 ~ submitHandler ~ error:", error);
     }
@@ -171,7 +185,12 @@ export function Comment({ id }: CommentProps) {
             )}
           </div>
           {user.isAuth ? (
-            <Button variant="ghost" color="primary" startContent={<Send />}>
+            <Button
+              variant="ghost"
+              color="primary"
+              startContent={<Send />}
+              onClick={submitHandler}
+            >
               Submit Comment
             </Button>
           ) : (
@@ -226,7 +245,7 @@ export function Comment({ id }: CommentProps) {
                     </time>
                   </div>
                 </div>
-                <p>{item.content}</p>
+                <pre>{item.content}</pre>
               </div>
             </div>
           );
