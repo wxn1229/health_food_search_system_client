@@ -9,7 +9,12 @@ import {
 } from "@/components/ui/select";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import { Slider, Button, Textarea } from "@nextui-org/react";
-import { Send } from "lucide-react";
+import {
+  FilePenLine,
+  MessageSquare,
+  MessageSquareText,
+  Send,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { default as axios } from "@/utils/axios";
 import { useAuth } from "@/utils/AuthContext";
@@ -35,25 +40,66 @@ export function Comment({ id }: CommentProps) {
   const [score, setScore] = useState<number | number[]>(0);
   const { user } = useAuth();
   const [reload, setReload] = useState(true);
+  const [isComment, setIsComment] = useState(false);
+  const [curCommentNum, setCurCommentNum] = useState(0);
+  const [curCommentScore, setCurCommentScore] = useState(0.0);
 
   useEffect(() => {
+    async function getCurCommentData() {
+      try {
+        const curCommentData = await axios.post(
+          "/api/searching/getCommentDataById",
+          {
+            hfId: id,
+          }
+        );
+        console.log("🚀 ~ getCurCommentData ~ curCommentData:", curCommentData);
+
+        setCurCommentNum(curCommentData.data.result.CurCommentNum);
+        setCurCommentScore(curCommentData.data.result.CurPoint);
+      } catch (error) {
+        console.log("🚀 ~ getCurCommentData ~ error:", error);
+      }
+    }
+
     async function getComments() {
       try {
         const comments = await axios.post("/api/user/getComments", {
           hfId: id,
         });
-        console.log("🚀 ~ getComments ~ comments:", comments);
+        // console.log("🚀 ~ getComments ~ comments:", comments);
         setCommentData(comments.data.comments);
       } catch (error) {
         console.log("🚀 ~ getComments ~ error:", error);
       }
     }
 
+    async function getIsComment() {
+      try {
+        const isComment = await axios.post(
+          "/api/user/isComment",
+          {
+            hfId: id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+            },
+          }
+        );
+        // console.log("🚀 ~ getIsComment ~ isComment:", isComment);
+        setContent(isComment.data.isComment.content);
+        setScore(isComment.data.isComment.point);
+        setIsComment(true);
+      } catch (error) {
+        console.log("🚀 ~ getIsComment ~ error:", error);
+      }
+    }
+
     getComments();
+    getIsComment();
+    getCurCommentData();
   }, [reload]);
-  function formatComment(content: string) {
-    return content.replace(/\n/g, "<br/>");
-  }
 
   async function submitHandler() {
     try {
@@ -73,7 +119,6 @@ export function Comment({ id }: CommentProps) {
         }
       );
 
-      console.log("🚀 ~ submitHandler ~ submit:", submit);
       setReload(!reload);
     } catch (error) {
       console.log("🚀 ~ submitHandler ~ error:", error);
@@ -81,9 +126,8 @@ export function Comment({ id }: CommentProps) {
   }
 
   useEffect(() => {
-    console.log("🚀 ~ Comment ~ content:", content);
-
-    console.log("🚀 ~ Comment ~ score:", score);
+    // console.log("🚀 ~ Comment ~ content:", content);
+    // console.log("🚀 ~ Comment ~ score:", score);
   }, [content, score]);
   const getTimeDifference = (isoTime: string): string => {
     const currentTime = new Date();
@@ -133,14 +177,26 @@ export function Comment({ id }: CommentProps) {
 
       <form className="grid gap-4">
         {user.isAuth ? (
-          <Textarea
-            className="min-h-[120px]"
-            placeholder="Write your feedback here..."
-            value={content}
-            onChange={(e) => {
-              setContent(e.target.value);
-            }}
-          />
+          isComment ? (
+            <Textarea
+              isDisabled
+              className="min-h-[120px]"
+              placeholder="Write your feedback here..."
+              value={content}
+              onChange={(e) => {
+                setContent(e.target.value);
+              }}
+            />
+          ) : (
+            <Textarea
+              className="min-h-[120px]"
+              placeholder="Write your feedback here..."
+              value={content}
+              onChange={(e) => {
+                setContent(e.target.value);
+              }}
+            />
+          )
         ) : (
           <Textarea
             isDisabled
@@ -152,20 +208,38 @@ export function Comment({ id }: CommentProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 flex-1 pr-20">
             {user.isAuth ? (
-              <Slider
-                size="sm"
-                step={1}
-                color="primary"
-                label="Score"
-                showSteps={true}
-                maxValue={5}
-                minValue={0}
-                defaultValue={score}
-                onChange={(e) => {
-                  setScore(e);
-                }}
-                className="max-w-md"
-              />
+              isComment ? (
+                <Slider
+                  isDisabled
+                  size="sm"
+                  step={1}
+                  color="primary"
+                  label="Score"
+                  showSteps={true}
+                  maxValue={5}
+                  minValue={0}
+                  value={score}
+                  onChange={(e) => {
+                    setScore(e);
+                  }}
+                  className="max-w-md"
+                />
+              ) : (
+                <Slider
+                  size="sm"
+                  step={1}
+                  color="primary"
+                  label="Score"
+                  showSteps={true}
+                  maxValue={5}
+                  minValue={0}
+                  value={score}
+                  onChange={(e) => {
+                    setScore(e);
+                  }}
+                  className="max-w-md"
+                />
+              )
             ) : (
               <Slider
                 isDisabled
@@ -176,7 +250,7 @@ export function Comment({ id }: CommentProps) {
                 showSteps={true}
                 maxValue={5}
                 minValue={0}
-                defaultValue={score}
+                value={score}
                 onChange={(e) => {
                   setScore(e);
                 }}
@@ -185,14 +259,27 @@ export function Comment({ id }: CommentProps) {
             )}
           </div>
           {user.isAuth ? (
-            <Button
-              variant="ghost"
-              color="primary"
-              startContent={<Send />}
-              onClick={submitHandler}
-            >
-              Submit Comment
-            </Button>
+            isComment ? (
+              <Button
+                variant="ghost"
+                color="success"
+                startContent={<FilePenLine />}
+                onClick={() => {
+                  setIsComment(false);
+                }}
+              >
+                edit Comment
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                color="primary"
+                startContent={<Send />}
+                onClick={submitHandler}
+              >
+                Submit Comment
+              </Button>
+            )
           ) : (
             <Button
               isDisabled
@@ -205,6 +292,16 @@ export function Comment({ id }: CommentProps) {
           )}
         </div>
       </form>
+      <div className="flex">
+        <div className="flex items-center">
+          <StarIcon className="w-4 h-4 fill-gray-900 dark:fill-gray-50" />
+          <div>: {curCommentScore}</div>
+        </div>
+        <div className="flex items-center ml-10">
+          <MessageSquareText className="w-4 h-4 fill-gray-900 dark:fill-gray-50" />
+          <div>: {curCommentNum}</div>
+        </div>
+      </div>
       <div className="space-y-6 overflow-y-auto max-h-[240px]">
         {commentData.map((item, index) => {
           return (

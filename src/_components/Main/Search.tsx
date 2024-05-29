@@ -8,6 +8,8 @@ import {
   Button,
   DateInput,
   Input,
+  Radio,
+  RadioGroup,
 } from "@nextui-org/react";
 import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,6 +24,10 @@ interface SearchPropsType {
 }
 
 export default function Search({ sendSearchSetting }: SearchPropsType) {
+  const [orderBy, setOrderBy] = useState("id");
+  const [userGender, setUserGender] = useState("male");
+  const [orderDirection, setOrderDirection] = useState("asc");
+
   const [searchSetting, setSearchSetting] =
     useState<SearchSettingType>(InitSearchSetting);
 
@@ -50,6 +56,12 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
     }
     getData();
   }, []);
+  useEffect(() => {
+    setSearchSetting({ ...searchSetting, orderBy: orderBy });
+  }, [orderBy]);
+  useEffect(() => {
+    setSearchSetting({ ...searchSetting, orderDir: orderDirection });
+  }, [orderDirection]);
 
   // onlistening selectOptions
   // useEffect(() => {
@@ -203,6 +215,33 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
                 );
               })}
             </Autocomplete>
+          </div>
+
+          <div className="flex gap-4 overflow-hidden">
+            <RadioGroup
+              className="flex-1"
+              label="Please choose a criterion for sorting the list"
+              orientation="horizontal"
+              defaultValue="male"
+              value={orderBy}
+              onValueChange={setOrderBy}
+            >
+              <Radio value="id">id</Radio>
+              <Radio value="score">commment score</Radio>
+              <Radio value="commentNumber">comment number</Radio>
+              <Radio value="date">acess date</Radio>
+            </RadioGroup>
+            <RadioGroup
+              label="Please choose ascending or descending order for sorting."
+              className="flex-1"
+              orientation="horizontal"
+              defaultValue="male"
+              value={orderDirection}
+              onValueChange={setOrderDirection}
+            >
+              <Radio value="asc">ascending</Radio>
+              <Radio value="desc">descending</Radio>
+            </RadioGroup>
           </div>
 
           <Button

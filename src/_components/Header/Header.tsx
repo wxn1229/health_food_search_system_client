@@ -63,12 +63,21 @@ export default function Header() {
         </NavbarBrand>
         <NavbarContent className="sm:flex gap-4" justify="center">
           <NavbarItem>
-            <Link color="foreground" href="#">
+            <Link
+              color="foreground"
+              onClick={() => {
+                router.push("/");
+              }}
+            >
               Search
             </Link>
           </NavbarItem>
-          <NavbarItem isActive>
-            <Link href="#" aria-current="page">
+          <NavbarItem>
+            <Link
+              onClick={() => {
+                router.push("/favorite");
+              }}
+            >
               like
             </Link>
           </NavbarItem>
@@ -104,9 +113,7 @@ export default function Header() {
                 onClick={() => {
                   logout();
                 }}
-                as={Link}
                 color="warning"
-                href="#"
                 variant="ghost"
               >
                 Log out
