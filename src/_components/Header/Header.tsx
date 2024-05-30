@@ -15,9 +15,11 @@ import { Divider } from "@nextui-org/react";
 import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "next/navigation";
 import { default as axios } from "@/utils/axios";
+import { Heart, Search, SeparatorHorizontalIcon, Settings } from "lucide-react";
 
 export default function Header() {
   const { login, reload } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     async function verifyToken() {
@@ -35,6 +37,8 @@ export default function Header() {
           login(user.data.user.Name);
           console.log("🚀 ~ verifyToken ~ isVaild:", isVaild);
         }
+
+        setIsAdmin(isVaild.data.isAdmin);
       } catch (error) {
         console.log("🚀 ~ verifyToken ~ error:", error);
       }
@@ -63,28 +67,37 @@ export default function Header() {
         </NavbarBrand>
         <NavbarContent className="sm:flex gap-4" justify="center">
           <NavbarItem>
-            <Link
-              color="foreground"
+            <Button
+              variant="light"
+              startContent={<Search></Search>}
               onClick={() => {
                 router.push("/");
               }}
             >
               Search
-            </Link>
+            </Button>
           </NavbarItem>
           <NavbarItem>
-            <Link
+            <Button
+              variant="light"
+              startContent={<Heart></Heart>}
               onClick={() => {
                 router.push("/favorite");
               }}
             >
               like
-            </Link>
+            </Button>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
+            {isAdmin ? (
+              <>
+                <Button startContent={<Settings></Settings>} variant="light">
+                  admin
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify="end">
