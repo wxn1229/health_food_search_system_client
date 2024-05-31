@@ -18,7 +18,7 @@ import { default as axios } from "@/utils/axios";
 import { Heart, Search, SeparatorHorizontalIcon, Settings } from "lucide-react";
 
 export default function Header() {
-  const { login, reload } = useAuth();
+  const { login, reload, reloading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function Header() {
         console.log("🚀 ~ verifyToken ~ error:", error);
       }
     }
+    setIsAdmin(false);
     verifyToken();
     // console.log("🚀 ~ Header ~ user:", user);
     // console.log(process.env.SERVER_URL);
@@ -85,13 +86,19 @@ export default function Header() {
                 router.push("/favorite");
               }}
             >
-              like
+              Favorite
             </Button>
           </NavbarItem>
           <NavbarItem>
             {isAdmin ? (
               <>
-                <Button startContent={<Settings></Settings>} variant="light">
+                <Button
+                  startContent={<Settings></Settings>}
+                  variant="light"
+                  onClick={() => {
+                    router.push("/admin");
+                  }}
+                >
                   admin
                 </Button>
               </>
@@ -112,6 +119,7 @@ export default function Header() {
                     router.push("/user/settings");
                   }}
                   color="primary"
+                  className="cursor-pointer"
                 >
                   {user.user_name}
                 </Link>
@@ -125,6 +133,7 @@ export default function Header() {
               <Button
                 onClick={() => {
                   logout();
+                  reloading();
                 }}
                 color="warning"
                 variant="ghost"
