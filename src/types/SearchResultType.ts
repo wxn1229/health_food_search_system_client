@@ -6,6 +6,7 @@ export type SearchResultType = {
     Name: string;
   };
   CF: {
+    Id: string;
     Name: string;
   };
   HF_and_BF: HealthBenefit[];

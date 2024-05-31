@@ -15,9 +15,11 @@ import { Divider } from "@nextui-org/react";
 import { useAuth } from "@/utils/AuthContext";
 import { useRouter } from "next/navigation";
 import { default as axios } from "@/utils/axios";
+import { Heart, Search, SeparatorHorizontalIcon, Settings } from "lucide-react";
 
 export default function Header() {
-  const { login, reload } = useAuth();
+  const { login, reload, reloading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     async function verifyToken() {
@@ -35,12 +37,16 @@ export default function Header() {
           login(user.data.user.Name);
           console.log("🚀 ~ verifyToken ~ isVaild:", isVaild);
         }
+
+        setIsAdmin(isVaild.data.isAdmin);
       } catch (error) {
         console.log("🚀 ~ verifyToken ~ error:", error);
       }
     }
+    setIsAdmin(false);
     verifyToken();
-    console.log(process.env.SERVER_URL);
+    // console.log("🚀 ~ Header ~ user:", user);
+    // console.log(process.env.SERVER_URL);
   }, [reload]);
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -62,19 +68,43 @@ export default function Header() {
         </NavbarBrand>
         <NavbarContent className="sm:flex gap-4" justify="center">
           <NavbarItem>
-            <Link color="foreground" href="#">
+            <Button
+              variant="light"
+              startContent={<Search></Search>}
+              onClick={() => {
+                router.push("/");
+              }}
+            >
               Search
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link href="#" aria-current="page">
-              like
-            </Link>
+            </Button>
           </NavbarItem>
           <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
+            <Button
+              variant="light"
+              startContent={<Heart></Heart>}
+              onClick={() => {
+                router.push("/favorite");
+              }}
+            >
+              Favorite
+            </Button>
+          </NavbarItem>
+          <NavbarItem>
+            {isAdmin ? (
+              <>
+                <Button
+                  startContent={<Settings></Settings>}
+                  variant="light"
+                  onClick={() => {
+                    router.push("/admin");
+                  }}
+                >
+                  admin
+                </Button>
+              </>
+            ) : (
+              <></>
+            )}
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify="end">
@@ -85,8 +115,11 @@ export default function Header() {
                 <Link
                   isBlock
                   showAnchorIcon
-                  href={`/user/settings`}
+                  onClick={() => {
+                    router.push("/user/settings");
+                  }}
                   color="primary"
+                  className="cursor-pointer"
                 >
                   {user.user_name}
                 </Link>
@@ -100,10 +133,9 @@ export default function Header() {
               <Button
                 onClick={() => {
                   logout();
+                  reloading();
                 }}
-                as={Link}
                 color="warning"
-                href="#"
                 variant="ghost"
               >
                 Log out

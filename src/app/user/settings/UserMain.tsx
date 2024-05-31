@@ -6,11 +6,17 @@ import {
   Button,
   Divider,
   Input,
+  Modal,
   Radio,
   RadioGroup,
   Slider,
   Tab,
   Tabs,
+  ModalContent,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
 } from "@nextui-org/react";
 import { KeyRound, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -31,6 +37,7 @@ interface changePasswordDataType {
 }
 
 export default function UserMain() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [userData, setUserData] = useState<UserDataType>({
     email: "exsample@gmail.com",
     name: "exsample",
@@ -236,7 +243,7 @@ export default function UserMain() {
                     <Divider className="my-4"></Divider>
                     <div className="font-bold text-2xl my-4">Email</div>
                     <Input
-                      isReadOnly
+                      isDisabled
                       type="email"
                       variant="bordered"
                       defaultValue="junior@nextui.org"
@@ -245,7 +252,7 @@ export default function UserMain() {
                     />
                     <div className="font-bold text-2xl my-4">Name</div>
                     <Input
-                      isReadOnly
+                      isDisabled
                       type="text"
                       variant="bordered"
                       defaultValue="junior"
@@ -254,7 +261,7 @@ export default function UserMain() {
                     />
                     <div className="font-bold text-2xl my-4">Age</div>
                     <Input
-                      isReadOnly
+                      isDisabled
                       type="text"
                       variant="bordered"
                       defaultValue="20"
@@ -263,7 +270,7 @@ export default function UserMain() {
                     />
                     <div className="font-bold text-2xl my-4">Gender</div>
                     <Input
-                      isReadOnly
+                      isDisabled
                       type="text"
                       variant="bordered"
                       defaultValue="male"
@@ -327,11 +334,41 @@ export default function UserMain() {
                       variant="bordered"
                       startContent={<Pencil />}
                       className="mt-8"
-                      onClick={updateHandler}
+                      onPress={onOpen}
                     >
                       edit profile
                     </Button>
                   </div>
+                  <Modal
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    backdrop="blur"
+                  >
+                    <ModalContent>
+                      {(onClose) => (
+                        <>
+                          <ModalHeader className="flex flex-col gap-1">
+                            double check
+                          </ModalHeader>
+                          <ModalBody>
+                            <p>Are you sure you want to edit your profile?</p>
+                          </ModalBody>
+                          <ModalFooter>
+                            <Button color="danger" onPress={onClose}>
+                              Close
+                            </Button>
+                            <Button
+                              color="primary"
+                              onClick={updateHandler}
+                              onPress={onClose}
+                            >
+                              Action
+                            </Button>
+                          </ModalFooter>
+                        </>
+                      )}
+                    </ModalContent>
+                  </Modal>
                 </Tab>
                 <Tab
                   key="changePassword"
@@ -396,12 +433,44 @@ export default function UserMain() {
                       color="warning"
                       variant="bordered"
                       startContent={<KeyRound />}
+                      onPress={onOpen}
                       className="mt-8"
-                      onClick={changePasswordHandler}
                     >
                       change passwrod
                     </Button>
                   </div>
+                  <Modal
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    backdrop="blur"
+                  >
+                    <ModalContent>
+                      {(onClose) => (
+                        <>
+                          <ModalHeader className="flex flex-col gap-1">
+                            double check
+                          </ModalHeader>
+                          <ModalBody>
+                            <p>
+                              Are you sure you want to change your password?
+                            </p>
+                          </ModalBody>
+                          <ModalFooter>
+                            <Button color="danger" onPress={onClose}>
+                              Close
+                            </Button>
+                            <Button
+                              color="primary"
+                              onClick={changePasswordHandler}
+                              onPress={onClose}
+                            >
+                              Action
+                            </Button>
+                          </ModalFooter>
+                        </>
+                      )}
+                    </ModalContent>
+                  </Modal>
                 </Tab>
               </Tabs>
             </div>

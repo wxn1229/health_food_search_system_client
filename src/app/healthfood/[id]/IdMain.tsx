@@ -1,15 +1,21 @@
 "use client";
-import { Card, CardBody, Image } from "@nextui-org/react";
+import { Card, CardBody, Divider, Image, Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { default as axios } from "../../../utils/axios";
 import { SearchByIdType } from "../../../types/SearchByIdType";
+import { useAuth } from "@/utils/AuthContext";
+import { Heart } from "lucide-react";
 
 interface IdMainProps {
   id: string;
 }
 
 export default function IdMain({ id }: IdMainProps) {
+  const [isFav, setIsFav] = useState(false);
+  const { user } = useAuth();
   const [IdData, setIdData] = useState<SearchByIdType>();
+
+  const [reload, setReload] = useState(false);
   useEffect(() => {
     async function getIdData() {
       try {
@@ -22,10 +28,71 @@ export default function IdMain({ id }: IdMainProps) {
       }
     }
     getIdData();
-  }, []);
+  }, [id]);
+  useEffect(() => {
+    async function getIsFav() {
+      try {
+        const IsFavRes = await axios.post(
+          "/api/user/isFavourite",
+          {
+            hfId: id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+            },
+          }
+        );
+        console.log("🚀 ~ getIsFav ~ IsFavRes:", IsFavRes);
+        setIsFav(IsFavRes.data.isFav);
+      } catch (error) {
+        console.log("🚀 ~ getIsFav ~ error:", error);
+      }
+    }
+
+    getIsFav();
+  }, [reload, id]);
+
+  const addFavHandler = async () => {
+    try {
+      const addFav = axios.post(
+        "/api/user/addFavourite",
+        {
+          hfId: id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+          },
+        }
+      );
+      setReload(!reload);
+    } catch (error) {
+      console.log("🚀 ~ addFavHandler ~ error:", error);
+    }
+  };
+  const deleteFavHandler = async () => {
+    try {
+      const deleteFav = axios.post(
+        "/api/user/deleteFavourite",
+        {
+          hfId: id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+          },
+        }
+      );
+
+      setReload(!reload);
+    } catch (error) {
+      console.log("🚀 ~ addFavHandler ~ error:", error);
+    }
+  };
 
   return (
-    <div className="w-full h-full min-h-screen flex justify-center items-center">
+    <div className="w-full h-full flex justify-center items-center my-10">
       <Card className="w-[70%]">
         <CardBody className="w-full">
           <div className="flex w-full">
@@ -35,32 +102,35 @@ export default function IdMain({ id }: IdMainProps) {
               width={500}
               alt="title"
               className="h-full"
-              src={`/HF_img/${IdData?.Id}.jpg`}
+              src={`/HF_img/${id}.jpg`}
             />
-            <div className="w-[50%] px-4">
-              <h1>{IdData?.Name}</h1>
-              <div className="flex flex-col justify-around">
+            <div className="w-[50%] pl-4">
+              <div className="text-3xl font-bold">{IdData?.Name}</div>
+              <Divider className="my-4"></Divider>
+              <div className="flex flex-col justify-around gap-6">
                 <div className="flex justify-between">
-                  <div>Id: </div>
-                  <div className="max-w-80">{IdData?.Id}</div>
+                  <div className="w-28">Id: </div>
+                  <div className="max-w-80 flex-1">{IdData?.Id}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Applicant: </div>
-                  <div className="max-w-80">{IdData?.Applicant.Name}</div>
+                  <div className="w-28">Applicant: </div>
+                  <div className="max-w-80 flex-1">
+                    {IdData?.Applicant.Name}
+                  </div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Certification: </div>
-                  <div className="max-w-80">{IdData?.CF.Name}</div>
+                  <div className="w-28">Certification: </div>
+                  <div className="max-w-80 flex-1">{IdData?.CF.Name}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Acess Date: </div>
-                  <div className="max-w-80">
+                  <div className="w-28">Acess Date: </div>
+                  <div className="max-w-80 flex-1">
                     {IdData?.AcessDate.split("T")[0]}
                   </div>
                 </div>
-                <div className="flex justify-between  gap-2">
-                  <div>Ingredients : </div>
-                  <div className="flex flex-col items-end">
+                <div className="flex justify-between">
+                  <div className="w-28">Ingredients : </div>
+                  <div className="flex-1 flex flex-col items-start max-w-80">
                     {IdData?.HF_and_Ingredient.map((item, index) => {
                       return (
                         <div key={index} className="max-w-80">
@@ -72,9 +142,9 @@ export default function IdMain({ id }: IdMainProps) {
                     })}
                   </div>
                 </div>
-                <div className="flex justify-between  gap-2">
-                  <div>Benefits : </div>
-                  <div className="flex flex-col items-end">
+                <div className="flex justify-between">
+                  <div className="w-28">Benefits : </div>
+                  <div className="flex-1 flex flex-col items-start max-w-80">
                     {IdData?.HF_and_BF.map((item, index) => {
                       return (
                         <div className="max-w-80" key={index}>
@@ -85,20 +155,64 @@ export default function IdMain({ id }: IdMainProps) {
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Claims: </div>
-                  <div className="max-w-80">{IdData?.Claims}</div>
+                  <div className="w-28">Claims: </div>
+                  <div className="max-w-80 flex-1">{IdData?.Claims}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Precautions: </div>
-                  <div className="max-w-80">{IdData?.Precautions}</div>
+                  <div className="w-28">Precautions: </div>
+                  <div className="max-w-80 flex-1">{IdData?.Precautions}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Warning: </div>
-                  <div className="max-w-80">{IdData?.Warning}</div>
+                  <div className="w-28">Warning: </div>
+                  <div className="max-w-80 flex-1">{IdData?.Warning}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div>Website: </div>
-                  <div className="max-w-80">{IdData?.Website}</div>
+                  <div className="w-28">Website: </div>
+                  <div className="max-w-80 flex-1">{IdData?.Website}</div>
+                </div>
+
+                <Divider className="mt-4"></Divider>
+                <div className="flex justify-between items-center gap-2">
+                  {user.isAuth ? (
+                    isFav ? (
+                      <>
+                        <Button
+                          onClick={deleteFavHandler}
+                          startContent={<Heart fill={"#f31260"}></Heart>}
+                          variant="flat"
+                          color="danger"
+                        >
+                          Favorite
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={addFavHandler}
+                          startContent={<Heart fill={"none"}></Heart>}
+                          variant="flat"
+                          color="danger"
+                        >
+                          Favorite
+                        </Button>
+                      </>
+                    )
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => {
+                          alert(
+                            "If you want to join my favorites, please log in as a member first"
+                          );
+                        }}
+                        startContent={<Heart fill={`none`}></Heart>}
+                        variant="flat"
+                        color="danger"
+                      >
+                        Favorite
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

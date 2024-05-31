@@ -26,7 +26,6 @@ import { Key, useEffect, useState } from "react";
 
 export default function LoginTab() {
   const [selected, setSelected] = useState<Key>("login");
-
   const [passwordValid, setPasswordValid] = useState(true);
   const [checkPasswordCorrect, setCheckPasswordCorrect] = useState(false);
   const [checkName, setCheckName] = useState(true);

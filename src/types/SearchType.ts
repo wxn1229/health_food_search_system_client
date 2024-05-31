@@ -11,8 +11,8 @@ export type SearchSettingType = {
   certification: string;
   ingredient: string;
   benefit: string;
-  start_rate_point: number;
-  end_rate_point: number;
+  orderBy: string;
+  orderDir: string;
 };
 
 export const InitSearchSetting: SearchSettingType = {
@@ -24,6 +24,6 @@ export const InitSearchSetting: SearchSettingType = {
   certification: "",
   ingredient: "",
   benefit: "",
-  start_rate_point: 0.0,
-  end_rate_point: 5.0,
+  orderBy: "id",
+  orderDir: "asc",
 };
