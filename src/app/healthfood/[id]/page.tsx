@@ -1,3 +1,4 @@
+"use client";
 import Header from "@/_components/Header/Header";
 import IdMain from "./IdMain";
 import { Comment } from "@/components/comment";
