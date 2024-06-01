@@ -10,6 +10,7 @@ export interface SearchByIdType {
   Precautions: string;
   Website: string;
   ApplicantId: string;
+  ImgUrl: null | string;
   HF_and_BF: Array<{ BF: { Name: string } }>;
   HF_and_Ingredient: Array<{ IG: { Name: string; EnglishName: string } }>;
   Applicant: {

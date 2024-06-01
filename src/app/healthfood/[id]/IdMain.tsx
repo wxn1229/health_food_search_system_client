@@ -102,7 +102,11 @@ export default function IdMain({ id }: IdMainProps) {
               width={500}
               alt="title"
               className="h-full"
-              src={`/HF_img/${id}.jpg`}
+              src={`${
+                IdData?.ImgUrl === null
+                  ? `/HF_img/${IdData?.Id}.jpg`
+                  : `${IdData?.ImgUrl}`
+              }`}
             />
             <div className="w-[50%] px-10 flex-1">
               <div className="text-3xl font-bold">{IdData?.Name}</div>
