@@ -19,7 +19,9 @@ export default function IdMain({ id }: IdMainProps) {
   useEffect(() => {
     async function getIdData() {
       try {
-        const result = await axios.get(`/api/searching/searchById/${id}`);
+        const result = await axios.post("/api/searching/searchById", {
+          Id: id,
+        });
 
         console.log("🚀 ~ getIdData ~ IdData:", result.data.result);
         setIdData(result.data.result);
