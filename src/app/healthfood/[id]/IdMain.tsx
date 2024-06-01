@@ -104,7 +104,7 @@ export default function IdMain({ id }: IdMainProps) {
               className="h-full"
               src={`/HF_img/${id}.jpg`}
             />
-            <div className="w-[50%] pl-4">
+            <div className="w-[50%] px-10 flex-1">
               <div className="text-3xl font-bold">{IdData?.Name}</div>
               <Divider className="my-4"></Divider>
               <div className="flex flex-col justify-around gap-6">
