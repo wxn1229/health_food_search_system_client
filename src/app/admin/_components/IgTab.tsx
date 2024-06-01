@@ -27,6 +27,7 @@ import {
   Edit,
   EditIcon,
   PlusIcon,
+  RefreshCcw,
   SearchIcon,
   SquareX,
 } from "lucide-react";
@@ -165,9 +166,14 @@ export default function IgTab() {
     let filteredIgs = [...igs];
 
     if (hasSearchFilter) {
-      filteredIgs = filteredIgs.filter((ig) =>
-        ig.Name.toLowerCase().includes(filterValue.toLowerCase())
-      );
+      filteredIgs = filteredIgs.filter((ig) => {
+        const filterValueLower = filterValue.toLowerCase();
+        return (
+          ig.Name.toLowerCase().includes(filterValueLower) ||
+          ig.EnglishName?.toLowerCase().includes(filterValueLower) ||
+          ig.Id.toLowerCase().includes(filterValueLower)
+        );
+      });
     }
 
     return filteredIgs;
@@ -181,13 +187,23 @@ export default function IgTab() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by Id..."
+            placeholder="Search ..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
+            <Button
+              color="success"
+              endContent={<RefreshCcw />}
+              onClick={() => {
+                setIgs([]);
+                reloading();
+              }}
+            >
+              Refresh
+            </Button>
             <Button
               color="primary"
               endContent={<PlusIcon />}
@@ -211,8 +227,6 @@ export default function IgTab() {
             >
               <option value="3">3</option>
               <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
             </select>
           </label>
         </div>
@@ -286,11 +300,8 @@ export default function IgTab() {
       <div className="pl-8">
         {!editMode && !addMode && (
           <>
-            <div className="text-3xl font-bold">Ingredient</div>
-            <div className="mt-2 text-zinc-500">You can CURD this table</div>
+            <div className="text-3xl font-bold">Ingredient Table</div>
             <Divider className="my-4"></Divider>
-
-            <div className="font-bold text-2xl my-4">Table</div>
 
             <Table
               bottomContent={bottomContent}
@@ -382,7 +393,7 @@ function EditIg({ Id, closeEdit, reloading }: EditCerProps) {
     try {
       const editIg = await axios.patch(
         "/api/searchsetting/editIg",
-        { igId: Id, name: igData.Name },
+        { igId: Id, name: igData.Name, englishName: igData.EnglishName },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user_token")}`,
@@ -409,6 +420,14 @@ function EditIg({ Id, closeEdit, reloading }: EditCerProps) {
     }
     getEditData();
   }, [Id]);
+  const [editHaveName, setEditHaveName] = useState(false);
+  useEffect(() => {
+    if (igData.Name.trim() === "") {
+      setEditHaveName(false);
+    } else {
+      setEditHaveName(true);
+    }
+  }, [igData]);
 
   return (
     <>
@@ -425,7 +444,10 @@ function EditIg({ Id, closeEdit, reloading }: EditCerProps) {
       />
       <div className="font-bold text-2xl my-4">Name</div>
       <Input
+        isInvalid={!editHaveName}
+        errorMessage={"Can not be empty"}
         type="text"
+        isRequired
         variant="bordered"
         value={igData.Name}
         onChange={(e) => {
@@ -517,7 +539,7 @@ function AddIg({ closeAdd, reloading }: AddIgProps) {
     try {
       const createIg = await axios.post(
         "/api/searchsetting/createIg",
-        { igId: igData.Id, name: igData.Name },
+        { igId: igData.Id, name: igData.Name, englishName: igData.EnglishName },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user_token")}`,
@@ -534,8 +556,8 @@ function AddIg({ closeAdd, reloading }: AddIgProps) {
     async function getEditData() {
       try {
         const lastId = await axios.get("/api/searchsetting/getLastIgId");
-        const newId = `C${String(
-          parseInt(String(lastId.data.result.Id).split("I")[1], 10) + 1
+        const newId = `I${String(
+          parseInt(String(lastId.data.result[0].Id).split("I")[1], 10) + 1
         )}`;
         setIgData({ ...igData, Id: newId });
       } catch (error) {
@@ -547,7 +569,7 @@ function AddIg({ closeAdd, reloading }: AddIgProps) {
 
   return (
     <>
-      <div className="text-3xl font-bold">Edit Ingredient</div>
+      <div className="text-3xl font-bold">Create Ingredient</div>
       <Divider className="my-4"></Divider>
 
       <div className="font-bold text-2xl my-4">ID</div>

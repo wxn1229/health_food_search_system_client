@@ -25,7 +25,6 @@ interface SearchPropsType {
 
 export default function Search({ sendSearchSetting }: SearchPropsType) {
   const [orderBy, setOrderBy] = useState("id");
-  const [userGender, setUserGender] = useState("male");
   const [orderDirection, setOrderDirection] = useState("asc");
 
   const [searchSetting, setSearchSetting] =

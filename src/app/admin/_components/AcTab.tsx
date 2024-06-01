@@ -33,14 +33,14 @@ import {
 } from "lucide-react";
 import React, { Key, useCallback, useEffect, useMemo, useState } from "react";
 
-interface CersType {
+interface AcsType {
   Id: string;
   Name: string;
 }
 
-export default function CerTab() {
+export default function AcTab() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [Cers, setCers] = useState<CersType[]>([]);
+  const [acs, setAcs] = useState<AcsType[]>([]);
 
   const [reload, setReload] = useState(false);
   function reloading() {
@@ -68,8 +68,8 @@ export default function CerTab() {
   useEffect(() => {
     async function getCer() {
       try {
-        const CersData = await axios.get("/api/searchsetting/certification");
-        setCers(CersData.data.data);
+        const CersData = await axios.get("/api/searchsetting/applicant");
+        setAcs(CersData.data.data);
         console.log("🚀 ~ getCer ~ Cers:", CersData);
       } catch (error) {
         console.log("🚀 ~ getCer ~ error:", error);
@@ -79,44 +79,41 @@ export default function CerTab() {
     getCer();
   }, [reload]);
 
-  const renderCell = useCallback(
-    (Cer: CersType, columnKey: Key, Id: string) => {
-      const cellValue = Cer[columnKey as keyof CersType];
+  const renderCell = useCallback((Ac: AcsType, columnKey: Key, Id: string) => {
+    const cellValue = Ac[columnKey as keyof AcsType];
 
-      switch (columnKey) {
-        case "actions":
-          return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit">
-                <div
-                  onClick={() => {
-                    setEditId(Id);
-                    setEditMode(true);
-                  }}
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                >
-                  <EditIcon />
-                </div>
-              </Tooltip>
-              <Tooltip color="danger" content="Delete">
-                <div
-                  onClick={() => {
-                    setDeleteId(Id);
-                    onOpen();
-                  }}
-                  className="text-lg text-danger cursor-pointer active:opacity-50"
-                >
-                  <DeleteIcon />
-                </div>
-              </Tooltip>
-            </div>
-          );
-        default:
-          return cellValue;
-      }
-    },
-    []
-  );
+    switch (columnKey) {
+      case "actions":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Edit">
+              <div
+                onClick={() => {
+                  setEditId(Id);
+                  setEditMode(true);
+                }}
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              >
+                <EditIcon />
+              </div>
+            </Tooltip>
+            <Tooltip color="danger" content="Delete">
+              <div
+                onClick={() => {
+                  setDeleteId(Id);
+                  onOpen();
+                }}
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+              >
+                <DeleteIcon />
+              </div>
+            </Tooltip>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
 
   const [filterValue, setFilterValue] = useState("");
   const [page, setPage] = useState(1);
@@ -126,19 +123,18 @@ export default function CerTab() {
     new Set([])
   );
 
-  async function deleteHandler(cerId: string) {
+  async function deleteHandler(acId: string) {
     try {
-      console.log("🚀 ~ deleteHandler ~ cerId:", cerId);
-      const deleteCer = await axios.post(
-        "/api/searchsetting/deleteCer",
-        { cerId: cerId },
+      const deleteAc = await axios.post(
+        "/api/searchsetting/deleteAc",
+        { acId: acId },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user_token")}`,
           },
         }
       );
-      console.log("🚀 ~ deleteHandler ~ deleteCer:", deleteCer);
+      console.log("🚀 ~ deleteHandler ~ deleteAc:", deleteAc);
     } catch (error) {
       console.log("🚀 ~ deleteCer ~ error:", error);
     }
@@ -165,16 +161,20 @@ export default function CerTab() {
     setPage(1);
   }, []);
   const filteredItems = React.useMemo(() => {
-    let filteredCers = [...Cers];
+    let filteredAcs = [...acs];
 
     if (hasSearchFilter) {
-      filteredCers = filteredCers.filter((cer) =>
-        cer.Id.toLowerCase().includes(filterValue.toLowerCase())
-      );
+      filteredAcs = filteredAcs.filter((ac) => {
+        const filterValueLower = filterValue.toLowerCase();
+        return (
+          ac.Name.toLowerCase().includes(filterValueLower) ||
+          ac.Id.toLowerCase().includes(filterValueLower)
+        );
+      });
     }
 
-    return filteredCers;
-  }, [Cers, filterValue, reload]);
+    return filteredAcs;
+  }, [acs, filterValue, reload]);
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const topContent = useMemo(() => {
@@ -184,7 +184,7 @@ export default function CerTab() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by Id..."
+            placeholder="Search ..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onClear()}
@@ -195,7 +195,7 @@ export default function CerTab() {
               color="success"
               endContent={<RefreshCcw />}
               onClick={() => {
-                setCers([]);
+                setAcs([]);
                 reloading();
               }}
             >
@@ -214,7 +214,7 @@ export default function CerTab() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-default-400 text-small">
-            Total {Cers.length} Information
+            Total {acs.length} Information
           </span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
@@ -235,7 +235,7 @@ export default function CerTab() {
     onSearchChange,
     onRowsPerPageChange,
     hasSearchFilter,
-    Cers.length,
+    acs.length,
   ]);
   const onPreviousPage = React.useCallback(() => {
     if (page > 1) {
@@ -260,7 +260,7 @@ export default function CerTab() {
         <span className="w-[30%] text-small text-default-400">
           {selectedKeys === "all"
             ? "All items selected"
-            : `${selectedKeys.size} of ${Cers.length} selected`}
+            : `${selectedKeys.size} of ${acs.length} selected`}
         </span>
         <Pagination
           isCompact
@@ -298,7 +298,7 @@ export default function CerTab() {
       <div className="pl-8">
         {!editMode && !addMode && (
           <>
-            <div className="text-3xl font-bold">Certification Table</div>
+            <div className="text-3xl font-bold">Applicant Table</div>
             <Divider className="my-4"></Divider>
 
             <Table
@@ -334,7 +334,7 @@ export default function CerTab() {
                       double check
                     </ModalHeader>
                     <ModalBody>
-                      <p>Are you sure you want to delete the certification?</p>
+                      <p>Are you sure you want to delete the applicant?</p>
                     </ModalBody>
                     <ModalFooter>
                       <Button color="danger" onPress={onClose}>
@@ -359,14 +359,14 @@ export default function CerTab() {
         )}
 
         {editMode && (
-          <EditCer
+          <EditAc
             Id={editId}
             closeEdit={closeEdit}
             reloading={reloading}
-          ></EditCer>
+          ></EditAc>
         )}
 
-        {addMode && <AddCer closeAdd={closeAdd} reloading={reloading}></AddCer>}
+        {addMode && <AddAc closeAdd={closeAdd} reloading={reloading}></AddAc>}
       </div>
     </>
   );
@@ -378,8 +378,8 @@ interface EditCerProps {
   reloading: () => void;
 }
 
-function EditCer({ Id, closeEdit, reloading }: EditCerProps) {
-  const [CerData, setCerData] = useState<CersType>({
+function EditAc({ Id, closeEdit, reloading }: EditCerProps) {
+  const [acData, setAcData] = useState<AcsType>({
     Id: "",
     Name: "",
   });
@@ -388,16 +388,16 @@ function EditCer({ Id, closeEdit, reloading }: EditCerProps) {
 
   async function editHandler() {
     try {
-      const editCer = await axios.patch(
-        "/api/searchsetting/editCer",
-        { cerId: Id, name: CerData.Name },
+      const editAc = await axios.patch(
+        "/api/searchsetting/editAc",
+        { acId: Id, name: acData.Name },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user_token")}`,
           },
         }
       );
-      console.log("🚀 ~ editHandler ~ editCer:", editCer);
+      console.log("🚀 ~ editHandler ~ editAc:", editAc);
     } catch (error) {
       console.log("🚀 ~ editHandler ~ error:", error);
     }
@@ -406,22 +406,29 @@ function EditCer({ Id, closeEdit, reloading }: EditCerProps) {
   useEffect(() => {
     async function getEditData() {
       try {
-        const editData = await axios.post(
-          "/api/searchsetting/certificationById",
-          { Id: Id }
-        );
+        const editData = await axios.post("/api/searchsetting/AcById", {
+          Id: Id,
+        });
         console.log("🚀 ~ getEditData ~ editData:", editData);
-        setCerData(editData.data.data);
+        setAcData(editData.data.data);
       } catch (error) {
         console.log("🚀 ~ getEditData ~ error:", error);
       }
     }
     getEditData();
   }, [Id]);
+  const [editHaveName, setEditHaveName] = useState(false);
+  useEffect(() => {
+    if (acData.Name.trim() === "") {
+      setEditHaveName(false);
+    } else {
+      setEditHaveName(true);
+    }
+  }, [acData]);
 
   return (
     <>
-      <div className="text-3xl font-bold">Edit Certification</div>
+      <div className="text-3xl font-bold">Edit Applicant</div>
       <Divider className="my-4"></Divider>
 
       <div className="font-bold text-2xl my-4">ID</div>
@@ -429,19 +436,23 @@ function EditCer({ Id, closeEdit, reloading }: EditCerProps) {
         isDisabled
         type="text"
         variant="bordered"
-        value={CerData.Id}
+        value={acData.Id}
         className="max-w-xs"
       />
       <div className="font-bold text-2xl my-4">Name</div>
       <Input
+        isInvalid={!editHaveName}
+        errorMessage={"Can not be empty"}
         type="text"
+        isRequired
         variant="bordered"
-        value={CerData.Name}
+        value={acData.Name}
         onChange={(e) => {
-          setCerData({ ...CerData, Name: e.target.value.trim() });
+          setAcData({ ...acData, Name: e.target.value.trim() });
         }}
         className="max-w-xs"
       />
+
       <div className="flex">
         <Button
           color="primary"
@@ -471,7 +482,7 @@ function EditCer({ Id, closeEdit, reloading }: EditCerProps) {
                   double check
                 </ModalHeader>
                 <ModalBody>
-                  <p>Are you sure you want to edit certification?</p>
+                  <p>Are you sure you want to edit applicant?</p>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" onPress={onClose}>
@@ -498,13 +509,13 @@ function EditCer({ Id, closeEdit, reloading }: EditCerProps) {
   );
 }
 
-interface AddCerProps {
+interface AddAcProps {
   closeAdd: () => void;
   reloading: () => void;
 }
 
-function AddCer({ closeAdd, reloading }: AddCerProps) {
-  const [CerData, setCerData] = useState<CersType>({
+function AddAc({ closeAdd, reloading }: AddAcProps) {
+  const [acData, setAcData] = useState<AcsType>({
     Id: "",
     Name: "",
   });
@@ -513,16 +524,16 @@ function AddCer({ closeAdd, reloading }: AddCerProps) {
 
   async function addHandler() {
     try {
-      const createCer = await axios.post(
-        "/api/searchsetting/createCer",
-        { cerId: CerData.Id, name: CerData.Name },
+      const createAc = await axios.post(
+        "/api/searchsetting/createAc",
+        { acId: acData.Id, name: acData.Name },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user_token")}`,
           },
         }
       );
-      console.log("🚀 ~ addHandler ~ createCer:", createCer);
+      console.log("🚀 ~ addHandler ~ createAc:", createAc);
     } catch (error) {
       console.log("🚀 ~ editHandler ~ error:", error);
     }
@@ -531,11 +542,11 @@ function AddCer({ closeAdd, reloading }: AddCerProps) {
   useEffect(() => {
     async function getEditData() {
       try {
-        const lastId = await axios.get("/api/searchsetting/getLastCerId");
-        const newId = `C${String(
-          parseInt(String(lastId.data.result[0].Id).split("C")[1], 10) + 1
+        const lastId = await axios.get("/api/searchsetting/getLastAcId");
+        const newId = `P${String(
+          parseInt(String(lastId.data.result[0].Id).split("P")[1], 10) + 1
         )}`;
-        setCerData({ ...CerData, Id: newId });
+        setAcData({ ...acData, Id: newId });
       } catch (error) {
         console.log("🚀 ~ getEditData ~ error:", error);
       }
@@ -545,7 +556,7 @@ function AddCer({ closeAdd, reloading }: AddCerProps) {
 
   return (
     <>
-      <div className="text-3xl font-bold">Create Certification</div>
+      <div className="text-3xl font-bold">Create Applicant</div>
       <Divider className="my-4"></Divider>
 
       <div className="font-bold text-2xl my-4">ID</div>
@@ -553,19 +564,20 @@ function AddCer({ closeAdd, reloading }: AddCerProps) {
         isDisabled
         type="text"
         variant="bordered"
-        value={CerData.Id}
+        value={acData.Id}
         className="max-w-xs"
       />
       <div className="font-bold text-2xl my-4">Name</div>
       <Input
         type="text"
         variant="bordered"
-        value={CerData.Name}
+        value={acData.Name}
         onChange={(e) => {
-          setCerData({ ...CerData, Name: e.target.value.trim() });
+          setAcData({ ...acData, Name: e.target.value.trim() });
         }}
         className="max-w-xs"
       />
+
       <div className="flex">
         <Button
           color="primary"
@@ -595,7 +607,7 @@ function AddCer({ closeAdd, reloading }: AddCerProps) {
                   double check
                 </ModalHeader>
                 <ModalBody>
-                  <p>Are you sure you want to create certification?</p>
+                  <p>Are you sure you want to create applicant?</p>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" onPress={onClose}>
