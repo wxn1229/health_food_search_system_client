@@ -127,7 +127,9 @@ export default function HfCard({ item }: HfCardProps) {
             width="100"
             alt={item.Name}
             className="w-full h-[384px] object-cover "
-            src={`/HF_img/${item.Id}.jpg`}
+            src={`${
+              item.ImgUrl === null ? `/HF_img/${item.Id}.jpg` : `${item.ImgUrl}`
+            }`}
           />
           <div className="w-full flex flex-col justify-between flex-1">
             <div className="flex justify-between mt-3 px-1 gap-2">

@@ -7,7 +7,11 @@ import {
 } from "@/types/SearchSettingType";
 import { InitSearchSetting, SearchSettingType } from "@/types/SearchType";
 import { default as axios } from "@/utils/axios";
-import { parseDate } from "@internationalized/date";
+import {
+  CalendarDateTime,
+  parseDate,
+  CalendarDate,
+} from "@internationalized/date";
 import {
   Divider,
   useDisclosure,
@@ -342,10 +346,10 @@ export default function HfTab() {
 
   return (
     <>
-      <div className="pl-8 max-h-[550px] overflow-y-auto">
+      <div className="pl-8 max-h-[70vh] overflow-y-auto">
         {!editMode && !addMode && (
           <>
-            <div className="text-3xl font-bold">Benefit Table</div>
+            <div className="text-3xl font-bold">Health Food Table</div>
             <Divider className="my-4"></Divider>
 
             <Table
@@ -460,7 +464,7 @@ function initializeHealthFoodData(): HealthFoodData {
   return {
     Id: "",
     Name: "",
-    AcessDate: "1911-01-01T00:00:00.000Z",
+    AcessDate: "1991-01-01T00:00:00.000Z",
     CFId: "",
     CurCommentNum: 0,
     CurPoint: 0.0,
@@ -496,6 +500,12 @@ function EditHf({ Id, closeEdit, reloading }: EditCerProps) {
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  const [tmpDate, setTempDate] = useState(parseDate("1991-01-01"));
+  useEffect(() => {
+    console.log("🚀 ~ EditHf ~ tmpDate:", tmpDate);
+    setTempDate(parseDate(formatDate(hfData.AcessDate)));
+  }, [hfData]);
+
   async function editHandler() {
     try {
       if (checkErrors(errors)) {
@@ -521,7 +531,7 @@ function EditHf({ Id, closeEdit, reloading }: EditCerProps) {
             name: hfData.Name,
             acId: hfData.ApplicantId,
             cfId: hfData.CFId,
-            acessDate: hfData.AcessDate,
+            acessDate: formatDateToISO(tmpDate.toString()),
             claims: hfData.Claims,
             warning: hfData.Warning,
             precautions: hfData.Precautions,
@@ -569,7 +579,6 @@ function EditHf({ Id, closeEdit, reloading }: EditCerProps) {
     Warning: false,
     Precautions: false,
     Website: false,
-    ImgUrl: false,
     AcId: false,
     CfId: false,
   });
@@ -581,7 +590,6 @@ function EditHf({ Id, closeEdit, reloading }: EditCerProps) {
       Warning: hfData.Warning.trim() === "",
       Precautions: hfData.Precautions.trim() === "",
       Website: hfData.Website.trim() === "",
-      ImgUrl: hfData.ImgUrl.trim() === "",
       AcId: hfData.ApplicantId.trim() === "",
       CfId: hfData.CFId.trim() === "",
     });
@@ -625,7 +633,7 @@ function EditHf({ Id, closeEdit, reloading }: EditCerProps) {
   }, []);
 
   const checkErrors = (errors: any) => {
-    const falseKeys = Object.keys(errors).filter((key) => !errors[key]);
+    const falseKeys = Object.keys(errors).filter((key) => errors[key]);
 
     if (falseKeys.length === 0) {
       return true;
@@ -686,9 +694,9 @@ function EditHf({ Id, closeEdit, reloading }: EditCerProps) {
         startContent={
           <CalculatorIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
         }
-        value={parseDate(formatDate(hfData.AcessDate))}
+        value={tmpDate}
         onChange={(e) => {
-          setHfData({ ...hfData, AcessDate: formatDateToISO(e.toString()) });
+          setTempDate(parseDate(e.toString()));
         }}
       />
 
@@ -879,70 +887,329 @@ interface AddHfProps {
 }
 
 function AddHf({ closeAdd, reloading }: AddHfProps) {
-  const [hfData, setHfData] = useState<HfsType>({
-    Id: "",
-    Name: "",
-    CfId: "",
-    CfName: "",
-    AcName: "",
-  });
+  const [hfData, setHfData] = useState<HealthFoodData>(
+    initializeHealthFoodData()
+  );
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   async function addHandler() {
     try {
-      const createHf = await axios.post(
-        "/api/searchsetting/createHf",
-        { hfId: hfData.Id, name: hfData.Name },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+      if (checkErrors(errors)) {
+        const keysArray = Array.from(bfSelectedKeys);
+        // 生成 HF_and_BF 陣列
+        let HF_and_BF = keysArray.map((item) => ({
+          bfId: item,
+        }));
+
+        const igkeysArray = Array.from(igSelectedKeys);
+        // 生成 HF_and_IG 陣列
+        let HF_and_IG = igkeysArray.map((item) => ({
+          igId: item,
+        }));
+
+        console.log("🚀 ~ editHandler ~ HF_and_IG:", HF_and_IG);
+        console.log("🚀 ~ editHandler ~ HF_and_BF:", HF_and_BF);
+
+        const editHf = await axios.post(
+          "/api/searchsetting/createHf",
+          {
+            hfId: hfData.Id,
+            name: hfData.Name,
+            acId: hfData.ApplicantId,
+            cfId: hfData.CFId,
+            acessDate: formatDateToISO(tmpDate.toString()),
+            claims: hfData.Claims,
+            warning: hfData.Warning,
+            precautions: hfData.Precautions,
+            website: hfData.Website,
+            imgUrl: hfData.ImgUrl,
+            HF_and_BF: HF_and_BF,
+            HF_and_IG: HF_and_IG,
           },
-        }
-      );
-      console.log("🚀 ~ addHandler ~ createHf:", createHf);
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+            },
+          }
+        );
+        console.log("🚀 ~ editHandler ~ editHf:", editHf);
+        reloading();
+        closeAdd();
+      } else {
+        alert("Please confirm whether the information is complete");
+      }
     } catch (error) {
       console.log("🚀 ~ editHandler ~ error:", error);
     }
   }
 
+  const [editHaveName, setEditHaveName] = useState(false);
+
+  const [errors, setErrors] = useState({
+    Id: false,
+    Name: false,
+    Claims: false,
+    Warning: false,
+    Precautions: false,
+    Website: false,
+    AcId: false,
+    CfId: false,
+  });
+
   useEffect(() => {
-    async function getEditData() {
+    setErrors({
+      Id: hfData.Id.trim() === "",
+      Name: hfData.Name.trim() === "",
+      Claims: hfData.Claims.trim() === "",
+      Warning: hfData.Warning.trim() === "",
+      Precautions: hfData.Precautions.trim() === "",
+      Website: hfData.Website.trim() === "",
+      AcId: hfData.ApplicantId.trim() === "",
+      CfId: hfData.CFId.trim() === "",
+    });
+  }, [hfData]);
+  useEffect(() => {
+    if (hfData.Name.trim() === "") {
+      setEditHaveName(false);
+    } else {
+      setEditHaveName(true);
+    }
+  }, [hfData]);
+
+  useEffect(() => {
+    console.log("🚀 ~ EditHf ~ hfData:", hfData);
+  }, [hfData]);
+
+  const [selectOptions, setSelectOptions] =
+    useState<selecOptionsType>(InitSelecOptions);
+
+  useEffect(() => {
+    async function getData() {
       try {
-        const lastId = await axios.get("/api/searchsetting/getLastHfId");
-        const newId = `B${String(
-          parseInt(String(lastId.data.result[0].Id).split("B")[1], 10) + 1
-        )}`;
-        setHfData({ ...hfData, Id: newId });
+        const applicants = await axios.get("/api/searchsetting/applicant");
+        const certifications = await axios.get(
+          "/api/searchsetting/certification"
+        );
+        const ingredients = await axios.get("/api/searchsetting/ingredient");
+        const benefits = await axios.get("/api/searchsetting/benefit");
+
+        setSelectOptions({
+          applicants: applicants.data.data,
+          certifications: certifications.data.data,
+          ingredients: ingredients.data.data,
+          benefits: benefits.data.data,
+        });
       } catch (error) {
-        console.log("🚀 ~ getEditData ~ error:", error);
+        console.log("🚀 ~ getData ~ error:", error);
       }
     }
-    getEditData();
+    getData();
   }, []);
 
+  const checkErrors = (errors: any) => {
+    const falseKeys = Object.keys(errors).filter((key) => errors[key]);
+
+    if (falseKeys.length === 0) {
+      return true;
+    } else {
+      console.log("These fields are false:", falseKeys);
+      return false;
+    }
+  };
+  function formatDate(isoDate: string): string {
+    const date = new Date(isoDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() 返回 0-11，需要加 1
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  const [igSelectedKeys, setIgSelectedKeys] = useState<Selection>(new Set([]));
+  const [bfSelectedKeys, setBfSelectedKeys] = useState<Selection>(new Set([]));
+
+  function formatDateToISO(dateString: string): string {
+    const [year, month, day] = dateString.split("-");
+    const date = new Date(
+      Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day))
+    );
+    return date.toISOString();
+  }
+  const [tmpDate, setTempDate] = useState(parseDate("1991-01-01"));
+  useEffect(() => {
+    console.log("🚀 ~ EditHf ~ tmpDate:", tmpDate);
+    setTempDate(parseDate(formatDate(hfData.AcessDate)));
+  }, [hfData]);
   return (
     <>
-      <div className="text-3xl font-bold">Create Benefit</div>
+      <div className="text-3xl font-bold">Edit Health Food</div>
       <Divider className="my-4"></Divider>
 
       <div className="font-bold text-2xl my-4">ID</div>
       <Input
-        isDisabled
+        isRequired
+        isInvalid={errors.Id}
+        errorMessage={"Can not be empty"}
         type="text"
         variant="bordered"
         value={hfData.Id}
+        onChange={(e) => {
+          setHfData({ ...hfData, Id: e.target.value.trim() });
+        }}
         className="max-w-xs"
       />
       <div className="font-bold text-2xl my-4">Name</div>
       <Input
+        isInvalid={errors.Name}
+        errorMessage={"Can not be empty"}
         type="text"
+        isRequired
         variant="bordered"
         value={hfData.Name}
         onChange={(e) => {
           setHfData({ ...hfData, Name: e.target.value.trim() });
         }}
         className="max-w-xs"
+      />
+
+      <div className="font-bold text-2xl my-4">Acess Date</div>
+      <DateInput
+        label={"Acess date"}
+        variant="bordered"
+        startContent={
+          <CalculatorIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+        }
+        value={tmpDate}
+        onChange={(e) => {
+          setTempDate(parseDate(e.toString()));
+        }}
+      />
+
+      <div className="font-bold text-2xl my-4">Applicant</div>
+      <Autocomplete
+        isRequired
+        isInvalid={errors.AcId}
+        errorMessage={"Can not be empty"}
+        variant="bordered"
+        defaultItems={selectOptions.applicants}
+        label="Applicant"
+        selectedKey={hfData.ApplicantId}
+        onSelectionChange={(e: any) => {
+          setHfData(() => {
+            if (e) {
+              return { ...hfData, ApplicantId: e.toString() };
+            } else {
+              return { ...hfData, ApplicantId: "" };
+            }
+          });
+        }}
+      >
+        {selectOptions.applicants.map((item) => {
+          return (
+            <AutocompleteItem key={item.Id} textValue={item.Name}>
+              {item.Name}
+            </AutocompleteItem>
+          );
+        })}
+      </Autocomplete>
+      <div className="font-bold text-2xl my-4">Certification</div>
+      <Autocomplete
+        isRequired
+        isInvalid={errors.CfId}
+        errorMessage={"Can not be empty"}
+        variant="bordered"
+        defaultItems={selectOptions.certifications}
+        label="Certification"
+        selectedKey={hfData.CFId}
+        onSelectionChange={(e: any) => {
+          setHfData(() => {
+            if (e) {
+              return { ...hfData, CFId: e.toString() };
+            } else {
+              return { ...hfData, CFId: "" };
+            }
+          });
+        }}
+      >
+        {selectOptions.certifications.map((item) => {
+          return (
+            <AutocompleteItem key={item.Id} textValue={item.Name}>
+              {item.Name}
+            </AutocompleteItem>
+          );
+        })}
+      </Autocomplete>
+
+      <div className="font-bold text-2xl my-4">Ingredient</div>
+      <IgTable
+        loadIngredients={selectOptions.ingredients}
+        oldIg={hfData.HF_and_Ingredient}
+        igSelectedKeys={igSelectedKeys}
+        setIgSelectedKeys={setIgSelectedKeys}
+      ></IgTable>
+      <div className="font-bold text-2xl my-4">Ingredient</div>
+      <BfTable
+        loadBf={selectOptions.benefits}
+        oldBf={hfData.HF_and_BF}
+        bfSelectedKeys={bfSelectedKeys}
+        setBfSelectedKeys={setBfSelectedKeys}
+      ></BfTable>
+      <div className="font-bold text-2xl my-4">Claims</div>
+      <Input
+        isInvalid={errors.Claims}
+        errorMessage={"Can not be empty"}
+        type="text"
+        isRequired
+        variant="bordered"
+        value={hfData.Claims}
+        onChange={(e) => {
+          setHfData({ ...hfData, Claims: e.target.value });
+        }}
+      />
+      <div className="font-bold text-2xl my-4">Warning</div>
+      <Input
+        isInvalid={errors.Warning}
+        errorMessage={"Can not be empty"}
+        type="text"
+        isRequired
+        variant="bordered"
+        value={hfData.Warning}
+        onChange={(e) => {
+          setHfData({ ...hfData, Warning: e.target.value });
+        }}
+      />
+      <div className="font-bold text-2xl my-4">Precautions</div>
+      <Input
+        isInvalid={errors.Precautions}
+        errorMessage={"Can not be empty"}
+        type="text"
+        isRequired
+        variant="bordered"
+        value={hfData.Precautions}
+        onChange={(e) => {
+          setHfData({ ...hfData, Precautions: e.target.value });
+        }}
+      />
+      <div className="font-bold text-2xl my-4">Website</div>
+      <Input
+        isInvalid={errors.Website}
+        errorMessage={"Can not be empty"}
+        type="text"
+        isRequired
+        variant="bordered"
+        value={hfData.Website}
+        onChange={(e) => {
+          setHfData({ ...hfData, Website: e.target.value.trim() });
+        }}
+      />
+      <div className="font-bold text-2xl my-4">ImgUrl</div>
+      <Input
+        type="text"
+        variant="bordered"
+        value={hfData.ImgUrl}
+        onChange={(e) => {
+          setHfData({ ...hfData, ImgUrl: e.target.value.trim() });
+        }}
       />
 
       <div className="flex">
@@ -974,7 +1241,7 @@ function AddHf({ closeAdd, reloading }: AddHfProps) {
                   double check
                 </ModalHeader>
                 <ModalBody>
-                  <p>Are you sure you want to create benefit?</p>
+                  <p>Are you sure you want to edit health food?</p>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" onPress={onClose}>
@@ -985,8 +1252,6 @@ function AddHf({ closeAdd, reloading }: AddHfProps) {
                     onPress={onClose}
                     onClick={() => {
                       addHandler();
-                      reloading();
-                      closeAdd();
                     }}
                   >
                     Action

@@ -2,6 +2,7 @@ export type SearchResultType = {
   Id: string;
   Name: string;
   AcessDate: string;
+  ImgUrl: null | string;
   Applicant: {
     Name: string;
   };

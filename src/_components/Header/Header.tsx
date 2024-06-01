@@ -24,7 +24,7 @@ export default function Header() {
   useEffect(() => {
     async function verifyToken() {
       try {
-        const isVaild = await axios.post("/api/user/verifyToken", {
+        const isVaild = await axios.get("/api/user/verifyToken", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("user_token")}`,
           },
