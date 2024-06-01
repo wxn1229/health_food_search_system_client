@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className={lato.className}>
+      <body className={`${lato.className}`}>
         <AuthProvider>
           <NextUIProvider>
             <NextThemesProvider attribute="class" defaultTheme="dark">

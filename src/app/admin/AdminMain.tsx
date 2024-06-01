@@ -1,6 +1,9 @@
 "use client";
 
+import AcTab from "@/app/admin/_components/AcTab";
+import BfTab from "@/app/admin/_components/BfTab";
 import CerTab from "@/app/admin/_components/CerTab";
+import HfTab from "@/app/admin/_components/HfTab";
 import IgTab from "@/app/admin/_components/IgTab";
 import { useAuth } from "@/utils/AuthContext";
 import { default as axios } from "@/utils/axios";
@@ -111,83 +114,15 @@ export default function AdminMain() {
                 <Tab key="ingredient" title="Ingredient" className="flex-1">
                   <IgTab></IgTab>
                 </Tab>
-                <Tab
-                  key="changePassword"
-                  title="Change Password"
-                  className="flex-1"
-                >
-                  <div className="pl-8">
-                    <div className="text-3xl font-bold">Change Password</div>
-                    <div className="mt-2 text-zinc-500">
-                      You can change your password
-                    </div>
-                    <Divider className="my-4"></Divider>
 
-                    <div className="font-bold text-2xl my-4">Old Password</div>
-                    <Input
-                      type="password"
-                      variant="bordered"
-                      className="max-w-xs"
-                      onChange={(e) => {}}
-                    />
-                    <div className="font-bold text-2xl my-4">New Password</div>
-                    <Input
-                      type="password"
-                      variant="bordered"
-                      className="max-w-xs"
-                      errorMessage={
-                        "Password must be at least eight characters"
-                      }
-                      onChange={(e) => {}}
-                    />
-                    <div className="font-bold text-2xl my-4">
-                      Confirm Password
-                    </div>
-                    <Input
-                      type="password"
-                      variant="bordered"
-                      className="max-w-xs"
-                      errorMessage={"Not the same as new password"}
-                      onChange={(e) => {}}
-                    />
-                    <Button
-                      color="warning"
-                      variant="bordered"
-                      startContent={<KeyRound />}
-                      onPress={onOpen}
-                      className="mt-8"
-                    >
-                      change passwrod
-                    </Button>
-                  </div>
-                  <Modal
-                    isOpen={isOpen}
-                    onOpenChange={onOpenChange}
-                    backdrop="blur"
-                  >
-                    <ModalContent>
-                      {(onClose) => (
-                        <>
-                          <ModalHeader className="flex flex-col gap-1">
-                            double check
-                          </ModalHeader>
-                          <ModalBody>
-                            <p>
-                              Are you sure you want to change your password?
-                            </p>
-                          </ModalBody>
-                          <ModalFooter>
-                            <Button color="danger" onPress={onClose}>
-                              Close
-                            </Button>
-                            <Button color="primary" onPress={onClose}>
-                              Action
-                            </Button>
-                          </ModalFooter>
-                        </>
-                      )}
-                    </ModalContent>
-                  </Modal>
+                <Tab key="benefit" title="Benefit" className="flex-1">
+                  <BfTab></BfTab>
+                </Tab>
+                <Tab key="applicant" title="Applicant" className="flex-1">
+                  <AcTab></AcTab>
+                </Tab>
+                <Tab key="healthFood" title="Health Food" className="flex-1">
+                  <HfTab></HfTab>
                 </Tab>
               </Tabs>
             </div>
