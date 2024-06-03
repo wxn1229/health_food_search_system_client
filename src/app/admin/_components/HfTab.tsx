@@ -40,6 +40,7 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
+import { AxiosError } from "axios";
 import { access } from "fs";
 import {
   CalculatorIcon,
@@ -939,7 +940,10 @@ function AddHf({ closeAdd, reloading }: AddHfProps) {
       } else {
         alert("Please confirm whether the information is complete");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        alert("health food ID is exist, please change a ID");
+      }
       console.log("🚀 ~ editHandler ~ error:", error);
     }
   }
