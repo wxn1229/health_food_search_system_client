@@ -133,20 +133,20 @@ export default function HfCard({ item }: HfCardProps) {
           />
           <div className="w-full flex flex-col justify-between flex-1">
             <div className="flex justify-between mt-3 px-1 gap-2">
-              <div>Health Food Id: </div>
+              <div>健康食品 Id: </div>
               <div>{item.Id}</div>
             </div>
             <div className="flex justify-between mt-3 px-1 gap-2">
-              <div>Health Food Name: </div>
+              <div>健康食品名稱 : </div>
               <div>{item.Name}</div>
             </div>
 
             <div className="flex justify-between mt-3 px-1 gap-2">
-              <div>Acess Date: </div>
+              <div>通過日期: </div>
               <div>{item.AcessDate.split("T")[0]}</div>
             </div>
             <div className="flex justify-between mt-3 px-1 gap-2">
-              <div>Ingredients : </div>
+              <div>成份 : </div>
               <div className="flex flex-col items-end">
                 {item.HF_and_Ingredient.map((item, index) => {
                   return (
@@ -160,7 +160,7 @@ export default function HfCard({ item }: HfCardProps) {
               </div>
             </div>
             <div className="flex justify-between mt-3 px-1 gap-2">
-              <div>Benefits : </div>
+              <div>功效 : </div>
               <div className="flex flex-col items-end">
                 {item.HF_and_BF.map((item, index) => {
                   return <div key={item.BF.Id}>{item.BF.Name}</div>;

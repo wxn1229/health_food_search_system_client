@@ -113,27 +113,27 @@ export default function IdMain({ id }: IdMainProps) {
               <Divider className="my-4"></Divider>
               <div className="flex flex-col justify-around gap-6">
                 <div className="flex justify-between">
-                  <div className="w-28">Id: </div>
+                  <div className="w-28">ID: </div>
                   <div className="max-w-80 flex-1">{IdData?.Id}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Applicant: </div>
+                  <div className="w-28">申請公司: </div>
                   <div className="max-w-80 flex-1">
                     {IdData?.Applicant.Name}
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Certification: </div>
+                  <div className="w-28">核准狀態: </div>
                   <div className="max-w-80 flex-1">{IdData?.CF.Name}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Acess Date: </div>
+                  <div className="w-28">通過日期: </div>
                   <div className="max-w-80 flex-1">
                     {IdData?.AcessDate.split("T")[0]}
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Ingredients : </div>
+                  <div className="w-28">成份 : </div>
                   <div className="flex-1 flex flex-col items-start max-w-80">
                     {IdData?.HF_and_Ingredient.map((item, index) => {
                       return (
@@ -147,7 +147,7 @@ export default function IdMain({ id }: IdMainProps) {
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Benefits : </div>
+                  <div className="w-28">功效 : </div>
                   <div className="flex-1 flex flex-col items-start max-w-80">
                     {IdData?.HF_and_BF.map((item, index) => {
                       return (
@@ -159,19 +159,19 @@ export default function IdMain({ id }: IdMainProps) {
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Claims: </div>
+                  <div className="w-28">保健功效宣稱: </div>
                   <div className="max-w-80 flex-1">{IdData?.Claims}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Precautions: </div>
+                  <div className="w-28">預防事項: </div>
                   <div className="max-w-80 flex-1">{IdData?.Precautions}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Warning: </div>
+                  <div className="w-28">警語: </div>
                   <div className="max-w-80 flex-1">{IdData?.Warning}</div>
                 </div>
                 <div className="flex justify-between">
-                  <div className="w-28">Website: </div>
+                  <div className="w-28">網站: </div>
                   <div className="max-w-80 flex-1">{IdData?.Website}</div>
                 </div>
 
