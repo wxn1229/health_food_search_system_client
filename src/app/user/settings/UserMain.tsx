@@ -89,7 +89,10 @@ export default function UserMain() {
       reloading();
       setSelected("profile");
       alert("success edit your profile");
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 409) {
+        alert("名字已經被使用請更換");
+      }
       console.log("🚀 ~ updateHandler ~ error:", error);
     }
   }
