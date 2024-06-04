@@ -87,7 +87,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
               });
             }}
             variant={mainvariant}
-            label="keypoint"
+            label="關鍵字"
           ></Input>
           <Input
             type="text"
@@ -100,7 +100,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
           ></Input>
           <div className="flex w-full flex-wrap md:flex-nowrap gap-4 ">
             <DateInput
-              label={"Strat date"}
+              label={"開始日期"}
               variant={mainvariant}
               value={searchSetting.start_date}
               onChange={(e) => {
@@ -108,7 +108,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
               }}
             />
             <DateInput
-              label={"End date"}
+              label={"結束日期"}
               variant={mainvariant}
               value={searchSetting.end_date}
               onChange={(e) => {
@@ -120,7 +120,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
             <Autocomplete
               variant={mainvariant}
               defaultItems={selectOptions.applicants}
-              label="Applicant"
+              label="申請公司"
               selectedKey={searchSetting.applicant}
               onSelectionChange={(e) => {
                 setSearchSetting(() => {
@@ -143,7 +143,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
             <Autocomplete
               variant={mainvariant}
               defaultItems={selectOptions.certifications}
-              label="certification"
+              label="核准狀態"
               onSelectionChange={(e) => {
                 setSearchSetting(() => {
                   if (e) {
@@ -167,7 +167,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
             <Autocomplete
               variant={mainvariant}
               defaultItems={selectOptions.ingredients}
-              label="Ingredient"
+              label="成分"
               onSelectionChange={(e) => {
                 setSearchSetting(() => {
                   if (e) {
@@ -195,7 +195,7 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
             <Autocomplete
               variant={mainvariant}
               defaultItems={selectOptions.benefits}
-              label="Benefit"
+              label="功效"
               onSelectionChange={(e) => {
                 setSearchSetting(() => {
                   if (e) {
@@ -219,19 +219,19 @@ export default function Search({ sendSearchSetting }: SearchPropsType) {
           <div className="flex gap-4 overflow-hidden">
             <RadioGroup
               className="flex-1"
-              label="Please choose a criterion for sorting the list"
+              label="排序依據"
               orientation="horizontal"
               defaultValue="male"
               value={orderBy}
               onValueChange={setOrderBy}
             >
               <Radio value="id">id</Radio>
-              <Radio value="score">commment score</Radio>
-              <Radio value="commentNumber">comment number</Radio>
-              <Radio value="date">acess date</Radio>
+              <Radio value="score">評論分數</Radio>
+              <Radio value="commentNumber">評論數量</Radio>
+              <Radio value="date">通過日期</Radio>
             </RadioGroup>
             <RadioGroup
-              label="Please choose ascending or descending order for sorting."
+              label="升序或降序"
               className="flex-1"
               orientation="horizontal"
               defaultValue="male"
