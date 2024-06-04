@@ -139,7 +139,10 @@ export default function CerTab() {
         }
       );
       console.log("🚀 ~ deleteHandler ~ deleteCer:", deleteCer);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 403) {
+        alert("這筆資料被其他資料參考無法刪除");
+      }
       console.log("🚀 ~ deleteCer ~ error:", error);
     }
   }
